@@ -1,0 +1,5 @@
+ignored:
+  - DL3008 # Use pinned version in apt-get install (python3-pip)
+  - DL3013 # Use pinned version in pip install (awscli)
+  - DL3005 # Do not use apt-get upgrade
+

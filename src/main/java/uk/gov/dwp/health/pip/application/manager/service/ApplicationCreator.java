@@ -1,0 +1,100 @@
+package uk.gov.dwp.health.pip.application.manager.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import uk.gov.dwp.health.pip.application.manager.config.properties.ApplicationProperties;
+import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
+import uk.gov.dwp.health.pip.application.manager.entity.Application;
+import uk.gov.dwp.health.pip.application.manager.entity.Audit;
+import uk.gov.dwp.health.pip.application.manager.entity.FormData;
+import uk.gov.dwp.health.pip.application.manager.entity.History;
+import uk.gov.dwp.health.pip.application.manager.entity.State;
+import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
+import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationCreateDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
+import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+@Service
+@Slf4j
+public class ApplicationCreator {
+
+  private final ApplicationProperties applicationProperties;
+  private final ApplicationRepository applicationRepository;
+  private final Clock clock;
+
+  public ApplicationDto createApplication(ApplicationCreateDto applicationCreateDto) {
+    log.info("About to create new application");
+
+    if (hasActiveApplication(applicationCreateDto.getClaimantId())) {
+      log.info("Claimant already has active application");
+      throw new IllegalStateException("ERROR: claimant already has active application");
+    }
+
+    log.info("dto to model");
+    Application application = toModel(applicationCreateDto);
+
+    log.info("About to save to db");
+    Application savedApplication = applicationRepository.save(application);
+
+    log.info("model to dto");
+    var applicationDto = toDto(savedApplication);
+
+    log.info("Created new application");
+
+    return applicationDto;
+  }
+
+  private boolean hasActiveApplication(String claimantId) {
+    List<Application> applications = applicationRepository.findAllByClaimantId(claimantId);
+
+    List<Application> activeApplications =
+        applications.stream()
+            .filter(
+                application -> {
+                  String current = application.getState().getCurrent();
+                  return ApplicationState.valueOf(current).getValue()
+                      < ApplicationState.SUBMITTED.getValue();
+                })
+            .collect(Collectors.toList());
+
+    return !activeApplications.isEmpty();
+  }
+
+  private Application toModel(ApplicationCreateDto applicationCreateDto) {
+    LocalDate today = LocalDate.now();
+    Instant now = clock.instant();
+
+    History applicationStateHistory =
+        History.builder().state(ApplicationState.REGISTRATION.toString()).timeStamp(now).build();
+    State applicationState = new State();
+    applicationState.addHistory(applicationStateHistory);
+
+    return Application.builder()
+        .audit(Audit.builder().created(now).lastModified(now).build())
+        .benefitCode(applicationCreateDto.getBenefitType().getValue())
+        .claimantId(applicationCreateDto.getClaimantId())
+        .effectiveFrom(today)
+        .effectiveTo(today.plus(applicationProperties.getActiveDuration(), ChronoUnit.DAYS))
+        .language(Language.valueOf(applicationCreateDto.getLanguage().getValue()))
+        .state(applicationState)
+        .registrationData(FormData.builder().build())
+        .pipcsRegistrationState(State.builder().build())
+        .build();
+  }
+
+  private ApplicationDto toDto(Application application) {
+    return new ApplicationDto()
+        .applicationId(application.getId())
+        .applicationStatus(
+            ApplicationDto.ApplicationStatusEnum.valueOf(application.getState().getCurrent()));
+  }
+}

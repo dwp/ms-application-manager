@@ -1,0 +1,136 @@
+version: "2.1"
+networks:
+  test:
+
+services:
+  localstack:
+    image: '${LOCALSTACK_IMAGE}'
+    environment:
+      SERVICES: sns, sqs, kms, ssm
+      HOSTNAME_EXTERNAL: localstack
+    volumes:
+      - ./config/localstack:/docker-entrypoint-initaws.d
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:4566" ]
+    ports:
+      - "4566:4566"
+    networks:
+      - test
+
+  mongo:
+    image: '${MONGO_IMAGE}'
+    command: --replSet rs0 --bind_ip_all
+    volumes:
+      - ./config/mongo/init-replicaset.js:/docker-entrypoint-initdb.d/init-replicaset.js
+      - ./config/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js
+    expose:
+      - 27017
+    ports:
+      - "27017:27017"
+    networks:
+      - test
+
+  ms-application-manager:
+    image: '${GITLAB_IMAGE}'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    ports:
+      - "9950:8080"
+      - "5009:5009"
+    depends_on:
+      mongo:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+    environment:
+      - V3_CREATE_TRUSTSTORE=false
+      - DOMAIN_SUFFIX=localstack
+      - COMMON_NAME=http://localstack:8080
+      - CIS_ROOT_CA=cis_ca_cert
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/pip-apply-application-mgr
+      - SPRING_CONFIG_ACTIVE_PROFILE_ON=dev
+      - PIP_APPLICATION_ACTIVE_DURATION=90
+      - FEATURE_ENCRYPTION_DATA_ENABLED=true
+      - FEATURE_ENCRYPTION_MESSAGING_ENABLED=false
+      - FEATURE_DATA_CHANGESTREAM_ENABLED=true
+      - FEATURE_CHANGESTREAM_DECRYPTION_ENABLED=false
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_COLLECTION=application
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_ROUTING_KEY=pip.app.mgr.stream
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_DATABASE=pip-apply-application-mgr
+      - UK_GOV_DWP_HEALTH_INTEGRATION_OUTBOUND_TOPIC_EXCHANGE=pip-app-analytics
+      - UK_GOV_DWP_HEALTH_INTEGRATION_MESSAGING_TYPE=aws
+      - UK_GOV_DWP_HEALTH_INTEGRATION_SNS_ENDPOINT_OVERRIDE=http://localstack:4566
+      - UK_GOV_DWP_HEALTH_INTEGRATION_SQS_ENDPOINT_OVERRIDE=http://localstack:4566
+      - UK_GOV_DWP_HEALTH_INTEGRATION_ENABLED=true
+      - UK_GOV_DWP_HEALTH_INTEGRATION_AWS_REGION=us-east-1
+      - APPLICATION_TRACING_ENABLED=true
+      - EVENT_OUTBOUND_WORKFLOW_TOPIC_EXCHANGE=workflow-topic
+      - EVENT_OUTBOUND_WORKFLOW_ROUTING_KEY=workflow
+      - EVENT_OUTBOUND_TOPIC_EXCHANGE=pipcs-registration-topic
+      - EVENT_OUTBOUND_ROUTING_KEY=pipcs-registration
+      - EVENT_INBOUND_TOPIC_NAME=pip-apply-topic-FOR-DELETION
+      - EVENT_INBOUND_ROUTING_KEY_REGISTRATION_RESPONSE=registration-response-routing-key
+      - EVENT_INBOUND_QUEUE_NAME_REGISTRATION_RESPONSE=pip-registration-response
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ENCRYPTION_MESSAGE_DATA_KEY_ID=alias/test_event_request_id
+      - PIP_BANK_VALIDATION_BASE_URL=http://wm-external-services:8080/api
+      - PIP_BANK_VALIDATION_CONSUMER_ID=123123
+      - PIP_BANK_VALIDATION_TLS_ENABLED=false
+      - PIP_BANK_VALIDATION_TRUST_STORE=trustStore.jks
+      - PIP_BANK_VALIDATION_TRUST_STORE_PASSWORD=
+      - PIP_BANK_VALIDATION_KEY_STORE=keyStore.jks
+      - PIP_BANK_VALIDATION_KEY_STORE_PASSWORD=
+      - PIP_BANK_VALIDATION_PROXY_ENABLED=false
+      - PIP_BANK_VALIDATION_PROXY_HOST=
+      - PIP_BANK_VALIDATION_PROXY_PORT=1
+      # below var should not be needed, asa app-level FLE encryption should be removed in favour of wireTiger
+      - AWS_ENCRYPTION_KMS_OVERRIDE=http://localstack:4566
+      - AWS_ENCRYPTION_MONGO_DATA_KEY_ID=alias/test_mongo_request_id
+      - AWS_ENCRYPTION_KMS_KEY_CACHE=true
+      - LOGGING_LEVEL_UK_GOV_DWP_HEALTH=DEBUG
+      - LOGGING_LEVEL_UK_GOV_DWP_HEALTH_MONGO_CHANGESTREAM_COMPONENT=INFO
+    networks:
+      - test
+
+  api-test:
+    container_name: api-test
+    image: '${MAVEN_IMAGE}'
+    entrypoint: /bin/bash -c
+    command:
+      - |
+        until [ `curl -s -o /dev/null -w "%{http_code}" http://ms-application-manager:8080/actuator/health` = "200" ]; do echo "service not available, sleeping 10."; sleep 10; done
+        sleep 30
+        mvn ${MVN_OPTS} verify -Papi-component-tests
+    working_dir: /usr/src
+    environment:
+      AWS_ACCESS_KEY: aws-access-key
+      AWS_SECRET_KEY: aws-secret-key
+      AWS_ENDPOINT_OVERRIDE: http://localstack:4566
+      WORKFLOW_REQUEST_QUEUE_URL: http://localstack:4566/000000000000/workflow-request-queue
+      HOST: http://ms-application-manager
+      PORT: 8080
+      MONGODB_HOST: mongo
+      MONGO_PORT: 27017
+      PIP_BANK_VALIDATION_BASE_URL: http://wm-external-services:8080/api
+    volumes:
+      - .:/usr/src
+      - ${MVN_M2}:/root/.m2
+      - ${MVN_SETTINGS_FILE_SAAS}:/root/.m2/settings.xml
+      - ./target/test/reports:/usr/src/target/test-reports
+    networks:
+      - test
+
+  wm-external-services:
+    image: '${MOCK_IMAGE}'
+    container_name: wm-external-services
+    expose:
+      - 8080
+    ports:
+      - "8950:8080"
+    command: --global-response-templating --verbose
+    networks:
+      - test

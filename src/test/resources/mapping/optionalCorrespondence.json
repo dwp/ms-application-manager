@@ -1,0 +1,98 @@
+{
+  "additionalSupport": {
+    "helpCommunicating": true,
+    "helpUnderstandingLetters": true,
+    "helperDetails": {
+      "surname": "Test1",
+      "firstname": "Test2"
+    }
+  },
+  "personalDetails": {
+    "surname": "testSurename",
+    "firstname": "testFirstname",
+    "nino": "RN000001D",
+    "dob": "2000-01-01",
+    "address": {
+      "line1": "123",
+      "line2": "city center",
+      "line3": "Leeds",
+      "town": "Leeds",
+      "county": "west",
+      "country": "England",
+      "postcode": "AB1 1AB"
+    },
+    "contact": {
+      "mobileNumber": "07777777777",
+      "alternativeNumber": "01139999999",
+      "textphone": "01139999999",
+      "smsUpdates": true
+    },
+    "alternateFormat": {
+      "formatType": "other",
+      "otherOptions": "colouredPaper",
+      "alternateFormatAdditionalInfo": "test"
+    }
+  },
+  "motabilityScheme": {
+    "receiveMotabilityInformation": "No"
+  },
+  "residenceAndPresence": {
+    "nationality": "Indian",
+    "residentBeforeBrexit": "Yes",
+    "inUkTwoOutOfThreeYears": "Don't know",
+    "receivingPensionsOrBenefitsFromEEA": true,
+    "payingInsuranceEEA": false
+  },
+  "aboutYourHealth": {
+    "healthConditions": [
+      "FEver",
+      "Headache",
+      "AA"
+    ],
+    "hcpContactConsent": true,
+    "hcpShareConsent": true,
+    "healthProfessionalsDetails1": {
+      "name": "Dr John",
+      "profession": "Doctor",
+      "phoneNumber": "07777777777",
+      "address": {
+        "line1": "999",
+        "line2": "town center",
+        "line3": "Leeds",
+        "town": "Leeds",
+        "county": "west",
+        "country": "England",
+        "postcode": "AB1 1AB"
+      },
+      "lastContact": "01/01/2021"
+    },
+    "healthProfessionalsDetails2": {
+      "name": "Dr Fee",
+      "profession": "Nurse",
+      "phoneNumber": "07777777777",
+      "address": {
+        "line1": "ABC",
+        "line2": "ABC",
+        "line3": "ABC",
+        "town": "ABC",
+        "county": "ABC",
+        "country": "England",
+        "postcode": "AB1 1AB"
+      },
+      "lastContact": "2 months ago"
+    },
+    "hospitalHospiceOrCarehome": {
+      "accommodationType": "hospital",
+      "address": {
+        "line1": "888",
+        "line2": "Test",
+        "line3": "Test3",
+        "town": "Leeds",
+        "county": "West",
+        "country": "England",
+        "postcode": "AB1 1AB"
+      },
+      "admissionDate": "2021-01-01"
+    }
+  }
+}

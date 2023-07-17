@@ -1,0 +1,15 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 5678
+  adminConnectors:
+    - type: http
+      port: 0
+
+metaDataServicePort: 8765
+metaDataRoleName: AWS-TEST-ROLE
+
+logging:
+  level: DEBUG
+  loggers:
+    org: INFO

@@ -1,0 +1,20 @@
+app_name: @project.artifactId@
+app_version: @project.version@
+
+spring:
+  application:
+    name: ms-application-manager
+  main:
+    banner-mode: 'off'
+  jmx:
+    enabled: false
+
+feature:
+  mongo:
+    stable:
+      api:
+        enabled: ${FEATURE_MONGO_STABLE_API_ENABLED:true}
+
+mongock:
+  change-logs-scan-package: uk.gov.dwp.health.pip.application.manager.migration
+

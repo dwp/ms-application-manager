@@ -1,0 +1,29 @@
+{
+  "validation": {
+    "preparing-food": null,
+    "preparing-food-cya": null,
+    "eating-and-drinking": {
+      "eatingDrinking": [
+        {
+          "summary": "daily-living-eating-drinking:errors.eatingDrinking.required",
+          "inline": "daily-living-eating-drinking:errors.eatingDrinking.required",
+          "focusSuffix": [],
+          "variables": {
+            "key1": "value1",
+            "key2": "value2"
+          },
+          "message": "daily-living-eating-drinking:errors.eatingDrinking.required",
+          "field": "eatingDrinking",
+          "fieldHref": "#f-eatingDrinking",
+          "validator": "Required"
+        }
+      ]
+    }
+  },
+  "nav": {
+    "language": "en"
+  },
+  "identity": {
+    "id": "default"
+  }
+}

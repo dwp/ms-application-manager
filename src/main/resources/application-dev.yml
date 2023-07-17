@@ -1,0 +1,32 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/example
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, info, health
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+  health:
+    mongo:
+      enabled: false
+
+pip:
+  application:
+    activeDuration: 90
+  registration:
+    resubmit:
+      timeout:
+        second: 3600
+

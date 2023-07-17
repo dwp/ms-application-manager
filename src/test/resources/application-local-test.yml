@@ -1,0 +1,41 @@
+aws:
+  encryption:
+    kms-override: http://localhost:4566
+    message-data-key-id: alias/test_event_request_id
+    mongo-data-key-id: alias/test_mongo_request_id
+    kms-key-cache: true
+  access:
+    key-id: test
+  secret:
+    access-key: test
+feature:
+  encryption:
+    data:
+      enabled: true
+    messaging:
+      enabled: true
+  data:
+    changestream:
+      enabled: true
+  correlation:
+    enabled: true
+
+uk:
+  gov:
+    dwp:
+      health:
+        changestream:
+          channels:
+            - collection: claim
+              routingKey: pip.app.mgr.stream
+              database: example
+              skipDecryption: true
+        integration:
+          messaging-type: aws
+          outbound-topic-exchange: pip-app-analytics
+          sns-endpoint-override: http://localhost:4566
+          aws-region: US_EAST_1
+
+pip:
+  application:
+    activeDuration: 90
