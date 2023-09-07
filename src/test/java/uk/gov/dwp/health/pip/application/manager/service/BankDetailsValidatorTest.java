@@ -15,10 +15,10 @@ import uk.gov.dwp.health.pip.application.manager.config.properties.BankDetailsVa
 import uk.gov.dwp.health.pip.application.manager.entity.BankDetailsValidityList;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity;
 import uk.gov.dwp.health.pip.application.manager.external.bankdetails.ApiException;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.DefaultApi;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AccountDetails;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AdditionalInformationDto;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.ValidationResultDto;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.DefaultApi;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AccountDetails;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AdditionalInformationDto;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.ValidationResultDto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,7 +58,7 @@ class BankDetailsValidatorTest {
     final ArgumentCaptor<AccountDetails> accountDetails = ArgumentCaptor.forClass(AccountDetails.class);
     final ArgumentCaptor<String> correlationIdCaptor = ArgumentCaptor.forClass(String.class);
     final ArgumentCaptor<String> consumerIdCaptor = ArgumentCaptor.forClass(String.class);
-    verify(defaultApi, times(1)).validate(correlationIdCaptor.capture(), consumerIdCaptor.capture(), accountDetails.capture());
+    verify(defaultApi, times(1)).validate1(correlationIdCaptor.capture(), consumerIdCaptor.capture(), accountDetails.capture());
     assertEquals(ACCOUNT_NUMBER, accountDetails.getValue().getAccountNumber());
     assertEquals(SORT_CODE, accountDetails.getValue().getSortCode());
     assertEquals(ROLL_NUMBER, accountDetails.getValue().getRollNumber());
@@ -72,7 +72,7 @@ class BankDetailsValidatorTest {
     result.setValidDetails(false);
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("6").severity(AdditionalInformationDto.SeverityEnum.ERROR));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("65").severity(AdditionalInformationDto.SeverityEnum.WARNING));
-    when(defaultApi.validate(any(), any(), any())).thenReturn(result);
+    when(defaultApi.validate1(any(), any(), any())).thenReturn(result);
     when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
     final BankDetailsValidityList actualResult = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
     assertNotNull(actualResult);
@@ -80,6 +80,20 @@ class BankDetailsValidatorTest {
     assertEquals(2, actualResult.getResults().length);
     assertEquals(BankDetailsValidity.INVALID_ACCOUNT_COMBINATION, actualResult.getResults()[0]);
     assertEquals(BankDetailsValidity.ROLL_NUMBER_REQUIRED, actualResult.getResults()[1]);
+  }
+
+  @Test
+  public void modulusCheckUnavailableWarningIgnored() throws ApiException {
+    final ValidationResultDto result = new ValidationResultDto();
+    result.setValidDetails(false);
+    result.addAdditionalInformationItem(new AdditionalInformationDto().code("002").severity(AdditionalInformationDto.SeverityEnum.WARNING));
+    when(defaultApi.validate1(any(), any(), any())).thenReturn(result);
+    when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
+    final BankDetailsValidityList actualResult = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
+    assertNotNull(actualResult);
+    assertNotNull(actualResult.getResults());
+    assertEquals(1, actualResult.getResults().length);
+    assertEquals(BankDetailsValidity.VALID, actualResult.getResults()[0]);
   }
 
   @Test
@@ -91,7 +105,7 @@ class BankDetailsValidatorTest {
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("70").severity(AdditionalInformationDto.SeverityEnum.WARNING));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("20").severity(AdditionalInformationDto.SeverityEnum.WARNING));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("47").severity(AdditionalInformationDto.SeverityEnum.WARNING));
-    when(defaultApi.validate(any(), any(), any())).thenReturn(result);
+    when(defaultApi.validate1(any(), any(), any())).thenReturn(result);
     when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
     final BankDetailsValidityList actualResult = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
     assertNotNull(actualResult);
@@ -108,7 +122,7 @@ class BankDetailsValidatorTest {
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("70").severity(AdditionalInformationDto.SeverityEnum.WARNING));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("20").severity(AdditionalInformationDto.SeverityEnum.WARNING));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("47").severity(AdditionalInformationDto.SeverityEnum.WARNING));
-    when(defaultApi.validate(any(), any(), any())).thenReturn(result);
+    when(defaultApi.validate1(any(), any(), any())).thenReturn(result);
     when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
     final BankDetailsValidityList actualResult = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
     assertNotNull(actualResult);
@@ -132,7 +146,7 @@ class BankDetailsValidatorTest {
     result.setValidDetails(false);
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("6").severity(AdditionalInformationDto.SeverityEnum.ERROR));
     result.addAdditionalInformationItem(new AdditionalInformationDto().code("65").severity(AdditionalInformationDto.SeverityEnum.WARNING));
-    when(defaultApi.validate(any(), any(), any())).thenThrow(new ApiException(responseErrorCode, ""));
+    when(defaultApi.validate1(any(), any(), any())).thenThrow(new ApiException(responseErrorCode, ""));
     when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
     final BankDetailsValidityList actualResult = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
     assertNotNull(actualResult);

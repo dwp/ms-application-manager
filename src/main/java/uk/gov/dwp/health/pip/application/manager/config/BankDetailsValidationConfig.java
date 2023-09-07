@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.dwp.health.pip.application.manager.config.properties.BankDetailsValidationProperties;
 import uk.gov.dwp.health.pip.application.manager.external.bankdetails.ApiClient;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.DefaultApi;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.DefaultApi;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;

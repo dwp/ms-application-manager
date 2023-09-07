@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
@@ -127,5 +128,28 @@ class RegistrationApiAdapterTest {
     var strCaptor = ArgumentCaptor.forClass(String.class);
     verify(applicationStatusGetter).getApplicationStatusByClaimantId(strCaptor.capture());
     assertThat(strCaptor.getValue()).isEqualTo(claimantId);
+  }
+
+  @Test
+  void should_return_application_status_and_claimant_id_when_getter_invoked() {
+    var applicationId = UUID.randomUUID().toString();
+    var claimantIdAndStatusDto = new ClaimantIdAndStatusDto();
+    claimantIdAndStatusDto.setApplicationStatus(ClaimantIdAndStatusDto.ApplicationStatusEnum.REGISTRATION);
+    when(applicationStatusGetter.getClaimantIdAndStatus(anyString()))
+            .thenReturn(claimantIdAndStatusDto);
+    var actual = registrationApiAdapter.getClaimantIdAndStatus(applicationId);
+
+    assertAll(
+            "assert application status response to be 200 and body with current status",
+            () -> {
+              var httpStatus = actual.getStatusCode();
+              assertThat(httpStatus).isEqualTo(HttpStatus.OK);
+              var applicationStatus =
+                      Objects.requireNonNull(actual.getBody()).getApplicationStatus().getValue();
+              assertThat(applicationStatus).isEqualTo("REGISTRATION");
+            });
+    var strCaptor = ArgumentCaptor.forClass(String.class);
+    verify(applicationStatusGetter).getClaimantIdAndStatus(strCaptor.capture());
+    assertThat(strCaptor.getValue()).isEqualTo(applicationId);
   }
 }

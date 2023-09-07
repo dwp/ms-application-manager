@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.V1Api;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
@@ -50,6 +51,12 @@ public class RegistrationApiAdapter implements V1Api {
   @Override
   public ResponseEntity<ApplicationStatusDto> getApplicationStatus(String claimantId) {
     var status = applicationStatusGetter.getApplicationStatusByClaimantId(claimantId);
+    return ResponseEntity.ok().body(status);
+  }
+
+  @Override
+  public ResponseEntity<ClaimantIdAndStatusDto> getClaimantIdAndStatus(String applicationId) {
+    var status = applicationStatusGetter.getClaimantIdAndStatus(applicationId);
     return ResponseEntity.ok().body(status);
   }
 }

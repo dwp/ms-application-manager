@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.dwp.health.pip.application.manager.config.properties.BankDetailsValidationProperties;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.DefaultApi;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.DefaultApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;

@@ -35,4 +35,10 @@
    ]]></notes>
     <cve>CVE-2023-3635</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.75.jar
+   ]]></notes>
+    <cve>CVE-2023-41080</cve>
+  </suppress>
 </suppressions>

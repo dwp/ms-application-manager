@@ -8,11 +8,11 @@ import uk.gov.dwp.health.pip.application.manager.config.properties.BankDetailsVa
 import uk.gov.dwp.health.pip.application.manager.entity.BankDetailsValidityList;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity;
 import uk.gov.dwp.health.pip.application.manager.external.bankdetails.ApiException;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.DefaultApi;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AccountDetails;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AdditionalInformationDto;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AdditionalInformationDto.SeverityEnum;
-import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.ValidationResultDto;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.DefaultApi;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AccountDetails;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AdditionalInformationDto;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AdditionalInformationDto.SeverityEnum;
+import uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.ValidationResultDto;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.IGNORE;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.INVALID_ACCOUNT_COMBINATION;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.INVALID_ROLL_NUMBER;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.INVALID_SORT_CODE_ACCOUNT_NUMBER_DATA_FORMAT;
@@ -27,8 +28,8 @@ import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetails
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.ROLL_NUMBER_REQUIRED;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.SERVICE_DOWN;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.VALID;
-import static uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AdditionalInformationDto.SeverityEnum.ERROR;
-import static uk.gov.dwp.health.pip.application.manager.external.bankdetails.v2.dto.AdditionalInformationDto.SeverityEnum.WARNING;
+import static uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AdditionalInformationDto.SeverityEnum.ERROR;
+import static uk.gov.dwp.health.pip.application.manager.external.bankdetails.v3.dto.AdditionalInformationDto.SeverityEnum.WARNING;
 
 @RequiredArgsConstructor
 @Service
@@ -57,7 +58,7 @@ public class BankDetailsValidator {
       final String correlationId = dwpCorrelationId == null
           ? UUID.randomUUID().toString()
           : dwpCorrelationId.toString();
-      final ValidationResultDto validationResultDto = api.validate(
+      final ValidationResultDto validationResultDto = api.validate1(
           correlationId, consumerId, accountDetails
       );
       if (validationResultDto == null || validationResultDto.isValidDetails() == null) {
@@ -96,7 +97,9 @@ public class BankDetailsValidator {
     if (newResult == null) {
       log.warn("Unexpected response from wizard code {}, severity {}", code, severity);
     } else {
-      result.addResult(newResult);
+      if (!newResult.equals(IGNORE)) {
+        result.addResult(newResult);
+      }
     }
   }
 
@@ -115,22 +118,20 @@ public class BankDetailsValidator {
   private void initialiseSeverityToCodesMap() {
     final Map<Integer, BankDetailsValidity> warningsMap = getCodesMap(WARNING);
     final Map<Integer, BankDetailsValidity> errorsMap = getCodesMap(ERROR);
-    // valid - 200 + (Warning + one of [1,4,5,6,11,26,67,78,95,100,101,102,103,104,105])
-    int[] codes = {1, 4, 5, 6, 11, 26, 67, 78, 95, 100, 101, 102, 103, 104, 105};
-    addCodesToMap(warningsMap, codes, VALID);
-    //          invalid account combination - 200 +
-    //               (Warning + one of [2,3,7,8,28,64,81,82,106]
-    //                Error + one of [6,7,11,12,13,14]) => BV4
-    codes = new int[]{2, 3, 7, 8, 28, 64, 81, 82, 106};
-    addCodesToMap(warningsMap, codes, INVALID_ACCOUNT_COMBINATION);
+    addCodesToMap(
+        warningsMap,
+        new int[]{1, 2, 4, 5, 6, 11, 26, 67, 78, 95, 100, 101, 102, 103, 104, 105},
+        IGNORE
+    );
+    addCodesToMap(
+        warningsMap,
+        new int[]{3, 7, 8, 28, 64, 81, 82, 106},
+        INVALID_ACCOUNT_COMBINATION
+    );
     addCodesToMap(errorsMap, new int[]{6, 7, 11, 12, 13, 14}, INVALID_ACCOUNT_COMBINATION);
-    //          invalid roll number - 200 + (Warning + one of [90,91,92,93,94]) => BV7
     addCodesToMap(warningsMap, new int[]{90, 91, 92, 93, 94}, INVALID_ROLL_NUMBER);
-    //          roll number format - 200 + (Error + one of [90,91,92]) => BV2
     addCodesToMap(errorsMap, new int[]{90, 91, 92}, ROLL_NUMBER_FORMAT);
-    //          roll number required - 200 + (Warning + one of [65]) => BV3
     addCodesToMap(warningsMap, new int[]{65}, ROLL_NUMBER_REQUIRED);
-    //          invalid sort code account number data format - 200 + (Error + one of [1,4]) => BV5
     addCodesToMap(errorsMap, new int[]{1, 4}, INVALID_SORT_CODE_ACCOUNT_NUMBER_DATA_FORMAT);
   }
 

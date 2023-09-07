@@ -26,11 +26,22 @@ public class PostBankDetailsValidationIT extends ApiTest {
   }
 
   @Test
+  public void shouldReturnValidForWarning2() {
+    // this acc num maps to response warning/002 which is now ignored:
+    final String accountNumber = "20000002";
+
+    final Response response = callBankDetailsValidationEndpoint(accountNumber);
+    int actualResponseCode = response.statusCode();
+
+    assertThat(actualResponseCode).isEqualTo(200);
+    assertThat(response.asString()).isEqualTo("[\"VALID\"]");
+  }
+
+  @Test
   public void shouldReturnInvalidAccountCombinationError() {
     // account numbers mapped to invalid account combination error stubs
     List<String> accountNumbers =
         Arrays.asList(
-            "20000002",
             "20000003",
             "20000006",
             "20000007",

@@ -19,6 +19,10 @@ public class UrlBuilderUtil {
     return baseURI + "/v1/application/" + applicationId + "/registration";
   }
 
+  public static String buildGetClaimantIdAndStatusByIdUrl(String applicationId) {
+    return baseURI + "/v1/application/" + applicationId + "/status";
+  }
+
   public static String buildGetRegistrationByIdV2Url(String applicationId) {
     return baseURI + "/v2/application/" + applicationId + "/registration";
   }
@@ -83,6 +87,15 @@ public class UrlBuilderUtil {
       String applicationId, String submissionId) {
     return baseURI
         + "/v1/application/"
+        + applicationId
+        + "/healthdisability/submission/"
+        + submissionId;
+  }
+
+  public static String buildPutHealthDisabilitySubmissionV2Url(
+      String applicationId, String submissionId) {
+    return baseURI
+        + "/v2/application/"
         + applicationId
         + "/healthdisability/submission/"
         + submissionId;

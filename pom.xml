@@ -13,7 +13,7 @@
 
     <groupId>uk.gov.dwp.health.pip</groupId>
     <artifactId>ms-application-manager</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
     <name>ms-pip-application-manager</name>
     <description>Strategic pip-apply micro service handle applicant application</description>
 
@@ -420,6 +420,8 @@
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/bankdetails/v1/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/v2/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/v2/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/v3/dto/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/v3/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/auth/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/external/bankdetails/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/v1/dto/*</exclude>
@@ -622,18 +624,18 @@
                     </execution>
                     <execution>
                         <!--                        For calling external bank details validation service -->
-                        <id>generate-bankdetails-api-v2</id>
+                        <id>generate-bankdetails-api-v3</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/schemas/api-spec/ms-application-manager/external-bank-validation-2.0.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/schemas/api-spec/ms-application-manager/external-bank-validation-3.0.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <generateSupportingFiles>true</generateSupportingFiles>
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
-                            <modelPackage>${client.base.package.name}.external.bankdetails.v2.dto</modelPackage>
-                            <apiPackage>${client.base.package.name}.external.bankdetails.v2</apiPackage>
+                            <modelPackage>${client.base.package.name}.external.bankdetails.v3.dto</modelPackage>
+                            <apiPackage>${client.base.package.name}.external.bankdetails.v3</apiPackage>
                             <configOptions>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>${project.artifactId}</artifactId>

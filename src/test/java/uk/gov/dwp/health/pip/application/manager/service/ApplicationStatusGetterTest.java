@@ -20,6 +20,7 @@ import uk.gov.dwp.health.pip.application.manager.model.registration.data.Registr
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.when;
 class ApplicationStatusGetterTest {
 
   private static final String CLAIMANT_ID = UUID.randomUUID().toString();
+  private static final String APPLICATION_ID = UUID.randomUUID().toString();
 
   @InjectMocks private ApplicationStatusGetter applicationStatusGetter;
   @Mock private ApplicationRepository repository;
@@ -145,5 +147,35 @@ class ApplicationStatusGetterTest {
     registrationSchema.setPersonalDetails(personalDetails);
 
     return registrationSchema;
+  }
+
+  @Test
+  void should_throw_application_not_found_exception_when_application_id_not_exist() {
+    when(repository.findById(anyString())).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> applicationStatusGetter.getClaimantIdAndStatus(APPLICATION_ID))
+            .isInstanceOf(ApplicationNotFoundException.class)
+            .hasMessage(String.format("No application found for given application id %s", APPLICATION_ID));
+    verify(repository).findById(stringArgumentCaptor.capture());
+    assertThat(stringArgumentCaptor.getValue()).isEqualTo(APPLICATION_ID);
+  }
+
+  @Test
+  void when_application_exists_for_claimant_id_and_status_request() {
+    var application =
+            Application.builder()
+                    .id("application-id-1")
+                    .claimantId("claimant-id-1")
+                    .state(State.builder().current("SUBMITTED").build())
+                    .build();
+
+    when(repository.findById(anyString()))
+            .thenReturn(Optional.of(application));
+
+    var claimantStatusDto =
+            applicationStatusGetter.getClaimantIdAndStatus("application-id-1");
+
+    assertThat(claimantStatusDto.getApplicationStatus().getValue()).isEqualTo("SUBMITTED");
+    assertThat(claimantStatusDto.getClaimantId()).isEqualTo("claimant-id-1");
+
   }
 }
