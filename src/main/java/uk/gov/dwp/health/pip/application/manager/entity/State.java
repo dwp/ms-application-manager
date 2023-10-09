@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import java.util.List;
 public class State {
 
   @Field(value = "current_state")
+  @Indexed
   private String current;
 
   @Field(value = "history")

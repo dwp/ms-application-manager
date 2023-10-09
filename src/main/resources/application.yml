@@ -4,6 +4,9 @@ app_version: @project.version@
 spring:
   application:
     name: ms-application-manager
+  data:
+    mongodb:
+      auto-index-creation: true
   main:
     banner-mode: 'off'
   jmx:
@@ -17,4 +20,3 @@ feature:
 
 mongock:
   change-logs-scan-package: uk.gov.dwp.health.pip.application.manager.migration
-

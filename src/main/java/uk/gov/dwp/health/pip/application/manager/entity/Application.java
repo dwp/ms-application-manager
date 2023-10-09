@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import uk.gov.dwp.health.mongo.changestream.extension.MongoChangeStreamIdentifier;
@@ -25,6 +26,7 @@ public class Application extends MongoChangeStreamIdentifier {
   @Id private String id;
 
   @Field(value = "claimant_id")
+  @Indexed
   private String claimantId;
 
   @Field(value = "forename")
@@ -34,6 +36,7 @@ public class Application extends MongoChangeStreamIdentifier {
   private String surname;
 
   @Field(value = "nino")
+  @Indexed
   private String nino;
 
   @Field(value = "benefit_code")

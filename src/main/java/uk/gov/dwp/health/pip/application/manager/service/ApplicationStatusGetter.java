@@ -11,8 +11,6 @@ import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.App
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -36,7 +34,7 @@ public class ApplicationStatusGetter {
     var application = applicationRepository.findById(applicationId);
     if (application.isEmpty()) {
       throw new ApplicationNotFoundException(
-              String.format("No application found for given application id %s", applicationId));
+          String.format("No application found for given application id %s", applicationId));
     }
 
     return toClaimantIdAndStatusDto(application.get());
@@ -47,8 +45,8 @@ public class ApplicationStatusGetter {
     ClaimantIdAndStatusDto claimantIdAndStatusDto = new ClaimantIdAndStatusDto();
     claimantIdAndStatusDto.setClaimantId(application.getClaimantId());
     claimantIdAndStatusDto.setApplicationStatus(
-            ClaimantIdAndStatusDto.ApplicationStatusEnum
-                    .fromValue(application.getState().getCurrent()));
+        ClaimantIdAndStatusDto.ApplicationStatusEnum.fromValue(
+            application.getState().getCurrent()));
     return claimantIdAndStatusDto;
   }
 
@@ -78,6 +76,4 @@ public class ApplicationStatusGetter {
 
     return applicationStatusDto;
   }
-
-
 }

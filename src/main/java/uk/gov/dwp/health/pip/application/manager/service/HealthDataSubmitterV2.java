@@ -1,8 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
-import java.time.Clock;
-import java.time.ZoneId;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,11 +7,9 @@ import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
-import uk.gov.dwp.health.pip.application.manager.messaging.WorkflowMessagePublisher;
-import uk.gov.dwp.health.pip.application.manager.openapi.healthdisability.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-import uk.gov.dwp.health.pip2.common.Pip2HealthDisabilityForm;
+
+import java.time.Clock;
 
 @RequiredArgsConstructor
 @Service
