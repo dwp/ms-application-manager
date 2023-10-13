@@ -6,11 +6,11 @@ project:
   - project_id: 28972556
     component_name: ms-application-manager
 
-    version: 2-3-0
+    version: 2-4-0
 
     last_verified:
       date: "2023-09-07"
-      name: "@charlie.mccabe"
+      name: "@nick.preece"
 
     tags:
       payments: false
