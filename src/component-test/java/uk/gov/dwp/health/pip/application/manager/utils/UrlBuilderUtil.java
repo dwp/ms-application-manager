@@ -47,18 +47,6 @@ public class UrlBuilderUtil {
     return baseURI + "/v1/application/" + applicationId + "/registration/submission";
   }
 
-  public static String buildGetHealthDisabilityUrl(String claimantId) {
-    return baseURI + "/v1/application/healthdisability?claimantId=" + claimantId;
-  }
-
-  public static String buildGetHealthDisabilityByIdUrl(String applicationId) {
-    return baseURI + "/v1/application/" + applicationId + "/healthdisability";
-  }
-
-  public static String buildGetHealthDisabilityByIdV2Url(String applicationId) {
-    return baseURI + "/v2/application/" + applicationId + "/healthdisability";
-  }
-
   public static String buildPutHealthDisabilityUrl(String applicationId) {
     return baseURI + "/v1/application/" + applicationId + "/healthdisability";
   }
@@ -67,29 +55,33 @@ public class UrlBuilderUtil {
     return baseURI + "/v1/validate";
   }
 
-  public static String buildGetClaimantsWithState(int batchSize, int page, final String state, final LocalDateTime timeFrom, final LocalDateTime timeTo) {
-    return buildGetClaimantsWithState(batchSize, page, state, formatIsoDateTime(timeFrom), formatIsoDateTime(timeTo));
+  public static String buildGetClaimantsWithState(
+      int batchSize,
+      int page,
+      final String state,
+      final LocalDateTime timeFrom,
+      final LocalDateTime timeTo) {
+    return buildGetClaimantsWithState(
+        batchSize, page, state, formatIsoDateTime(timeFrom), formatIsoDateTime(timeTo));
   }
 
-  public static String buildGetClaimantsWithState(int batchSize, int page, String state, String timeFromString, String timeToString) {
-    return baseURI + "/v1/application/healthdisability/" + state
-        + "?pageSize=" + batchSize
-        + "&page=" + page
-        + "&timestampFrom=" + timeFromString
-        + "&timestampTo=" + timeToString;
+  public static String buildGetClaimantsWithState(
+      int batchSize, int page, String state, String timeFromString, String timeToString) {
+    return baseURI
+        + "/v1/application/healthdisability/"
+        + state
+        + "?pageSize="
+        + batchSize
+        + "&page="
+        + page
+        + "&timestampFrom="
+        + timeFromString
+        + "&timestampTo="
+        + timeToString;
   }
 
   public static String formatIsoDateTime(final LocalDateTime time) {
     return DateTimeFormatter.ISO_DATE_TIME.format(time);
-  }
-
-  public static String buildPutHealthDisabilitySubmissionUrl(
-      String applicationId, String submissionId) {
-    return baseURI
-        + "/v1/application/"
-        + applicationId
-        + "/healthdisability/submission/"
-        + submissionId;
   }
 
   public static String buildPutHealthDisabilitySubmissionV2Url(

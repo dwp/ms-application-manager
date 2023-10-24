@@ -76,16 +76,14 @@ public class HealthDataGetter {
   }
 
   private List<ClaimantObject> mapToDto(List<Application> all) {
-    final List<ClaimantObject> claimantObjects =
-        all.stream()
-            .map(
-                application -> {
-                  ClaimantObject claimantObject = new ClaimantObject();
-                  claimantObject.claimantId(application.getClaimantId());
-                  return claimantObject;
-                })
-            .collect(Collectors.toList());
-    return claimantObjects;
+    return all.stream()
+        .map(
+            application -> {
+              ClaimantObject claimantObject = new ClaimantObject();
+              claimantObject.claimantId(application.getClaimantId());
+              return claimantObject;
+            })
+        .collect(Collectors.toList());
   }
 
   private HealthDisabilityDto mapToDto(Application application) {

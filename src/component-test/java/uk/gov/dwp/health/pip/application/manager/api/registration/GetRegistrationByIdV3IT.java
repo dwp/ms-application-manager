@@ -1,20 +1,7 @@
 package uk.gov.dwp.health.pip.application.manager.api.registration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetHealthDisabilityUrl;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetRegistrationByIdV3Url;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationSubmissionUrl;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationUrl;
-
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.api.ApiTest;
-import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Registration;
-import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.UpdateRegistration;
-import uk.gov.dwp.health.pip.application.manager.responsemodels.CreatedApplication;
-import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AdditionalSupportDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.HealthProfessionalDto;
@@ -24,23 +11,34 @@ import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.Reg
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto.LanguageEnum;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.ResidenceAndPresenceDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.StateDto.CurrentStateEnum;
+import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Registration;
+import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.UpdateRegistration;
+import uk.gov.dwp.health.pip.application.manager.responsemodels.CreatedApplication;
+import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetRegistrationByIdV3Url;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationSubmissionUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationUrl;
 
 class GetRegistrationByIdV3IT extends ApiTest {
 
   private CreatedApplication createdApplication;
-  private Registration applicationRequest;
-  private String line1 = "123";
-  private String line2 = "Headrow";
-  private String town = "Leeds";
-  private String county = "West Yorkshire";
-  private String postCode = "LS1 1AB";
-  private String country = "England";
-  private String phoneNo = "07777777777";
+  private final String line1 = "123";
+  private final String line2 = "Headrow";
+  private final String town = "Leeds";
+  private final String county = "West Yorkshire";
+  private final String postCode = "LS1 1AB";
+  private final String country = "England";
+  private final String phoneNo = "07777777777";
 
   @Test
   void shouldReturn200StatusCodeAndCorrectResponseBody() {
     createApplicationWithHealthDisabilityStatus();
-    buildGetHealthDisabilityUrl(applicationRequest.getClaimantId());
 
     var url = buildGetRegistrationByIdV3Url(createdApplication.getApplicationId());
     int actualResponseCode = getRequest(url).statusCode();
@@ -51,13 +49,13 @@ class GetRegistrationByIdV3IT extends ApiTest {
     assertThat(registrationDto.getEffectiveFrom()).isEqualTo(LocalDate.now().toString());
     assertThat(registrationDto.getEffectiveTo()).isEqualTo(LocalDate.now().plusDays(90).toString());
     assertThat(registrationDto.getLanguage()).isEqualTo(LanguageEnum.EN);
-    assertThat(registrationDto.getStateDto().getCurrentState()).isEqualTo(
-        CurrentStateEnum.HEALTH_AND_DISABILITY);
+    assertThat(registrationDto.getStateDto().getCurrentState())
+        .isEqualTo(CurrentStateEnum.HEALTH_AND_DISABILITY);
     assertThat(registrationDto.getStateDto().getHistory()).hasSize(2);
-    assertThat(registrationDto.getStateDto().getHistory().get(0).getState()).isEqualTo(
-        StateEnum.REGISTRATION);
-    assertThat(registrationDto.getStateDto().getHistory().get(1).getState()).isEqualTo(
-        StateEnum.HEALTH_AND_DISABILITY);
+    assertThat(registrationDto.getStateDto().getHistory().get(0).getState())
+        .isEqualTo(StateEnum.REGISTRATION);
+    assertThat(registrationDto.getStateDto().getHistory().get(1).getState())
+        .isEqualTo(StateEnum.HEALTH_AND_DISABILITY);
 
     verifyPersonalDetails(registrationDto.getPersonalDetails());
     verifyAboutYourHealth(registrationDto.getAboutYourHealth());
@@ -103,9 +101,7 @@ class GetRegistrationByIdV3IT extends ApiTest {
   private void verifyAboutYourHealth(AboutYourHealthDto aboutYourHealthDto) {
     List<String> conditions = aboutYourHealthDto.getConditions();
     assertThat(conditions).hasSize(1);
-    assertThat(conditions.get(0))
-        .isEqualTo(
-            "Illness.");
+    assertThat(conditions.get(0)).isEqualTo("Illness.");
     var careAccommodationDto = aboutYourHealthDto.getCareAccommodation();
     assertThat(careAccommodationDto.getAccommodationType().getValue()).isEqualTo("other");
     assertThat(careAccommodationDto.getAdmissionDate()).isEqualTo("2022-05-01");
@@ -131,8 +127,8 @@ class GetRegistrationByIdV3IT extends ApiTest {
     assertThat(healthProfessionalDto.getName()).isEqualTo("Dr Alazzz");
     assertThat(healthProfessionalDto.getProfession()).isEqualTo("Doctor");
     assertThat(healthProfessionalDto.getPhoneNumber()).isEqualTo(phoneNo);
-    assertThat(healthProfessionalDto.getLastContact()).isEqualTo(
-        "Last spoken to them on the last Fri of last month.");
+    assertThat(healthProfessionalDto.getLastContact())
+        .isEqualTo("Last spoken to them on the last Fri of last month.");
     var addressDto = healthProfessionalDto.getAddress();
     assertThat(addressDto.getLine1()).isEqualTo(line1);
     assertThat(addressDto.getLine2()).isEqualTo(line2);
@@ -146,8 +142,8 @@ class GetRegistrationByIdV3IT extends ApiTest {
     assertThat(healthProfessionalDto.getName()).isEqualTo("Dr Stevvve");
     assertThat(healthProfessionalDto.getProfession()).isEqualTo("Doctor");
     assertThat(healthProfessionalDto.getPhoneNumber()).isEqualTo(phoneNo);
-    assertThat(healthProfessionalDto.getLastContact()).isEqualTo(
-        "Last spoken to them on the last Fri of last month.");
+    assertThat(healthProfessionalDto.getLastContact())
+        .isEqualTo("Last spoken to them on the last Fri of last month.");
     var addressDto = healthProfessionalDto.getAddress();
     assertThat(addressDto.getLine1()).isEqualTo(line1);
     assertThat(addressDto.getLine2()).isEqualTo(line2);
@@ -168,21 +164,21 @@ class GetRegistrationByIdV3IT extends ApiTest {
   private void verifyAdditionalSupport(AdditionalSupportDto additionalSupportDto) {
     assertThat(additionalSupportDto.isHelpCommunicating()).isTrue();
     assertThat(additionalSupportDto.isHelpUnderstandingLetters()).isTrue();
-    assertThat(additionalSupportDto.getHelper().getFirstName())
-        .isEqualTo("Florenzzze");
-    assertThat(additionalSupportDto.getHelper().getSurname())
-        .isEqualTo("Nightingalezzz");
+    assertThat(additionalSupportDto.getHelper().getFirstName()).isEqualTo("Florenzzze");
+    assertThat(additionalSupportDto.getHelper().getSurname()).isEqualTo("Nightingalezzz");
   }
 
   private void createApplicationWithHealthDisabilityStatus() {
-    applicationRequest = Registration.builder().claimantId(RandomStringUtil.generate(24)).build();
-    createdApplication = extractPostRequest(buildPostApplicationUrl(), applicationRequest,
-        CreatedApplication.class);
+    Registration applicationRequest =
+        Registration.builder().claimantId(RandomStringUtil.generate(24)).build();
+    createdApplication =
+        extractPostRequest(buildPostApplicationUrl(), applicationRequest, CreatedApplication.class);
 
     UpdateRegistration updatedApplicationBody = UpdateRegistration.builder().build();
-    putRequest(buildPutRegistrationUrl(createdApplication.getApplicationId()),
-        updatedApplicationBody);
-    putRequest(buildPutRegistrationSubmissionUrl(createdApplication.getApplicationId()),
+    putRequest(
+        buildPutRegistrationUrl(createdApplication.getApplicationId()), updatedApplicationBody);
+    putRequest(
+        buildPutRegistrationSubmissionUrl(createdApplication.getApplicationId()),
         updatedApplicationBody);
   }
 }
