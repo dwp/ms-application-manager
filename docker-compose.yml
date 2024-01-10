@@ -67,8 +67,6 @@ services:
       - UK_GOV_DWP_HEALTH_INTEGRATION_ENABLED=true
       - UK_GOV_DWP_HEALTH_INTEGRATION_AWS_REGION=us-east-1
       - APPLICATION_TRACING_ENABLED=true
-      - EVENT_OUTBOUND_WORKFLOW_TOPIC_EXCHANGE=workflow-topic
-      - EVENT_OUTBOUND_WORKFLOW_ROUTING_KEY=workflow
       - EVENT_OUTBOUND_TOPIC_EXCHANGE=pipcs-registration-topic
       - EVENT_OUTBOUND_ROUTING_KEY=pipcs-registration
       - EVENT_INBOUND_TOPIC_NAME=pip-apply-topic-FOR-DELETION
@@ -91,7 +89,7 @@ services:
       - AWS_ENCRYPTION_KMS_OVERRIDE=http://localstack:4566
       - AWS_ENCRYPTION_MONGO_DATA_KEY_ID=alias/test_mongo_request_id
       - AWS_ENCRYPTION_KMS_KEY_CACHE=true
-      - LOGGING_LEVEL_UK_GOV_DWP_HEALTH=DEBUG
+      - LOGGING_LEVEL_UK_GOV_DWP_HEALTH=INFO
       - LOGGING_LEVEL_UK_GOV_DWP_HEALTH_MONGO_CHANGESTREAM_COMPONENT=INFO
     networks:
       - test
@@ -104,13 +102,13 @@ services:
       - |
         until [ `curl -s -o /dev/null -w "%{http_code}" http://ms-application-manager:8080/actuator/health` = "200" ]; do echo "service not available, sleeping 10."; sleep 10; done
         sleep 30
-        mvn ${MVN_OPTS} verify -Papi-component-tests
+        mvn ${MVN_OPTS} -Dmaven.failsafe.debug="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005" verify -Papi-component-tests
+    ports:
+      - "5005:5005"
     working_dir: /usr/src
     environment:
       AWS_ACCESS_KEY: aws-access-key
       AWS_SECRET_KEY: aws-secret-key
-      AWS_ENDPOINT_OVERRIDE: http://localstack:4566
-      WORKFLOW_REQUEST_QUEUE_URL: http://localstack:4566/000000000000/workflow-request-queue
       HOST: http://ms-application-manager
       PORT: 8080
       MONGODB_HOST: mongo

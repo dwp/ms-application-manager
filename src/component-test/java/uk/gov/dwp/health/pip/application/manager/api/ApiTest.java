@@ -8,13 +8,10 @@ import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
-import uk.gov.dwp.health.pip.application.manager.utils.MessageUtils;
 
 import static io.restassured.RestAssured.given;
 
 public class ApiTest {
-  protected static MessageUtils messageUtils;
-
   static RequestSpecification requestSpec;
 
   @BeforeAll
@@ -29,15 +26,6 @@ public class ApiTest {
             .addFilter(new AllureRestAssured())
             .addHeader("X-Correlation-Id", "aea45fc6-9ace-4fd9-b9a4-f78cdf1126a7")
             .build();
-
-    var serviceEndpoint = getEnv("AWS_ENDPOINT_OVERRIDE", "http://localhost:4566");
-    var awsRegion = getEnv("AWS_REGION", "us-east-1");
-    var workflowRequestQueueUrl =
-        getEnv(
-            "WORKFLOW_REQUEST_QUEUE_URL",
-            "http://localhost:4566/000000000000/workflow-request-queue");
-
-    messageUtils = new MessageUtils(serviceEndpoint, awsRegion, workflowRequestQueueUrl);
   }
 
   protected <T> T extractPostRequest(String path, Object bodyPayload, Class<T> responseClass) {

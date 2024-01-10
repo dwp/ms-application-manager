@@ -18,7 +18,7 @@ public class ApplicationProperties {
   @Min(value = 1, message = "Active duration must be grater or equals 1")
   private int activeDuration;
 
-  private String registrationFormSchemaVersion = "1.0.0";
+  private String registrationFormSchemaVersion = "1.2.0";
 
   private String healthDisabilityFormSchemaVersion = "1.0.0";
 }

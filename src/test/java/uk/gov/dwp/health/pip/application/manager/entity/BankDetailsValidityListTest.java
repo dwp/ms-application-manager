@@ -6,7 +6,7 @@ import uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidit
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("unit")
 public class BankDetailsValidityListTest {

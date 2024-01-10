@@ -1,9 +1,13 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,19 +15,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unit")
 class AlternateFormatMapperV3Test {
 
-  private AlternateFormat alternateFormat;
+  private AlternateFormat110 alternateFormat;
   private AlternateFormatMapperV3 alternateFormatMapperV3;
 
   @BeforeEach
   void beforeEach() {
-    alternateFormat = new AlternateFormat();
+    alternateFormat = new AlternateFormat110();
     alternateFormatMapperV3 = new AlternateFormatMapperV3();
   }
 
   @ParameterizedTest
   @CsvSource({"type1Uncontracted, type1Uncontracted", "type2Contracted, type2Contracted"})
   void when_braille(String formValue, String dtoValue) {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.BRAILLE);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.BRAILLE);
     alternateFormat.setAdditionalProperty("brailleOptions", formValue);
 
     var alternateFormatDto = alternateFormatMapperV3.toDto(alternateFormat);
@@ -41,7 +45,7 @@ class AlternateFormatMapperV3Test {
     "irishMpeg, irishMpeg"
   })
   void when_sign_language(String formValue, String dtoValue) {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.SIGN_LANGUAGE);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.SIGN_LANGUAGE);
     alternateFormat.setAdditionalProperty("signLanguageOptions", formValue);
 
     var alternateFormatDto = alternateFormatMapperV3.toDto(alternateFormat);
@@ -54,7 +58,7 @@ class AlternateFormatMapperV3Test {
   @ParameterizedTest
   @CsvSource({"cassette, cassette", "cd, cd", "dvd, dvd", "mp3, mp3"})
   void when_audio(String formValue, String dtoValue) {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.AUDIO);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.AUDIO);
     alternateFormat.setAdditionalProperty("audioOptions", formValue);
 
     var alternateFormatDto = alternateFormatMapperV3.toDto(alternateFormat);
@@ -67,7 +71,7 @@ class AlternateFormatMapperV3Test {
   @ParameterizedTest
   @CsvSource({"largePrint16Font, largePrint16Font", "accessiblePDF, accessiblePDF"})
   void when_other(String formValue, String dtoValue) {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.OTHER);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.OTHER);
     alternateFormat.setAdditionalProperty("otherOptions", formValue);
 
     var alternateFormatDto = alternateFormatMapperV3.toDto(alternateFormat);
@@ -85,7 +89,7 @@ class AlternateFormatMapperV3Test {
     "other, other"
   })
   void when_other_with_additional_info(String formValue, String dtoValue) {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.OTHER);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.OTHER);
     alternateFormat.setAdditionalProperty("otherOptions", formValue);
     alternateFormat.setAdditionalProperty(
         "alternateFormatAdditionalInfo", "alt-format-additional-info");
@@ -118,7 +122,7 @@ class AlternateFormatMapperV3Test {
 
   @Test
   void when_format_option_is_null() {
-    alternateFormat.setFormatType(AlternateFormat.FormatType.OTHER);
+    alternateFormat.setFormatType(AlternateFormat110.FormatType.OTHER);
 
     var alternateFormatDto = alternateFormatMapperV3.toDto(alternateFormat);
 

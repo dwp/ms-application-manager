@@ -1,10 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static support.FileUtils.getRegistrationDataFromFile;
-
-import java.io.IOException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -12,16 +7,21 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.HealthProfessionalDto;
+
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static support.FileUtils.getRegistrationDataFromFile;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Tag("unit")
 class AboutYourHealthMapperV3Test {
 
   private AboutYourHealthMapperV3 aboutYourHealthMapperV3;
-  private RegistrationSchema100 registrationSchema;
+  private RegistrationSchema120 registrationSchema;
 
   @BeforeEach
   void beforeEach() {

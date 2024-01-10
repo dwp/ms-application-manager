@@ -32,7 +32,7 @@ class PutApplicationSubmissionV2IT extends ApiTest {
   }
 
   @Test
-  void shouldPublishMessageAndReturn202StatusCode() {
+  void shouldReturn202StatusCode() {
     var updateHealthDisability = UpdateHealthDisability.builder().build();
     putRequest(healthDisabilityURL, updateHealthDisability);
 
@@ -58,13 +58,11 @@ class PutApplicationSubmissionV2IT extends ApiTest {
   }
 
   private void createApplicationWithHealthDisabilityStatus() {
-    // Create Application
     String claimantId = RandomStringUtil.generate(24);
     Registration registration = Registration.builder().claimantId(claimantId).build();
     createdApplication =
         extractPostRequest(buildPostApplicationUrl(), registration, CreatedApplication.class);
 
-    // Update and submit Registration data
     UpdateRegistration updatedApplicationBody = UpdateRegistration.builder().build();
     putRequest(
         buildPutRegistrationUrl(createdApplication.getApplicationId()), updatedApplicationBody);

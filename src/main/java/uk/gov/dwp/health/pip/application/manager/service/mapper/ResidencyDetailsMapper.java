@@ -3,7 +3,7 @@ package uk.gov.dwp.health.pip.application.manager.service.mapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.ResidentBeforeBrexit;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.residency.ResidencyDetails;
@@ -15,7 +15,7 @@ import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.YesNoDontKnow;
 @Slf4j
 class ResidencyDetailsMapper {
 
-  ResidencyDetails mapResidencyDetails(RegistrationSchema110 registrationSchema) {
+  ResidencyDetails mapResidencyDetails(RegistrationSchema120 registrationSchema) {
     var residenceAndPresence = registrationSchema.getResidenceAndPresence();
     var nationality = registrationSchema.getResidenceAndPresence().getNationality();
     var legacyNationalityValue = getLegacyNationalityValue(nationality);

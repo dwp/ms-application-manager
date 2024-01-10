@@ -1,7 +1,7 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AlternateFormatDto;
 
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 @Component
 class AlternateFormatMapperV3 {
 
-  AlternateFormatDto toDto(AlternateFormat alternateFormat) {
+  AlternateFormatDto toDto(AlternateFormat110 alternateFormat) {
     AlternateFormatDto.FormatTypeEnum alternateFormatType = null;
     AlternateFormatDto.OptionEnum alternateFormatOption = null;
     String alternateFormatAdditionalInfo = null;
@@ -26,7 +26,7 @@ class AlternateFormatMapperV3 {
   }
 
   private AlternateFormatDto.FormatTypeEnum getAlternateFormatType(
-      AlternateFormat alternateFormat) {
+      AlternateFormat110 alternateFormat) {
     if (alternateFormat.getFormatType() == null) {
       return null;
     }
@@ -34,7 +34,8 @@ class AlternateFormatMapperV3 {
     return AlternateFormatDto.FormatTypeEnum.fromValue(alternateFormatTypeValue);
   }
 
-  private AlternateFormatDto.OptionEnum getAlternateFormatOption(AlternateFormat alternateFormat) {
+  private AlternateFormatDto.OptionEnum getAlternateFormatOption(AlternateFormat110 alternateFormat
+  ) {
     Map<String, Object> additionalProperties = alternateFormat.getAdditionalProperties();
 
     var alternateFormatOption =
@@ -50,7 +51,7 @@ class AlternateFormatMapperV3 {
     return AlternateFormatDto.OptionEnum.fromValue(alternateFormatOption);
   }
 
-  private String getAlternateFormatAdditionalInfo(AlternateFormat alternateFormat) {
+  private String getAlternateFormatAdditionalInfo(AlternateFormat110 alternateFormat) {
     return (String) alternateFormat.getAdditionalProperties().get("alternateFormatAdditionalInfo");
   }
 }

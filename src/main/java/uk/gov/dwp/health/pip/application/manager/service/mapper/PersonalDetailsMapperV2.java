@@ -2,8 +2,8 @@ package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.Contact;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetails;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.Contact110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.ContactDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.PersonalDetailsDto;
 
@@ -14,7 +14,7 @@ class PersonalDetailsMapperV2 {
   private final AddressMapperV2 addressMapperV2;
   private final AlternateFormatMapperV2 alternateFormatMapperV2;
 
-  PersonalDetailsDto toDto(PersonalDetails personalDetails) {
+  PersonalDetailsDto toDto(PersonalDetailsSchema110 personalDetails) {
     var address = personalDetails.getAddress();
     var alternativeAddress = personalDetails.getAlternativeAddress();
     var contact = personalDetails.getContact();
@@ -31,7 +31,7 @@ class PersonalDetailsMapperV2 {
         .alternateFormat(alternateFormatMapperV2.toDto(alternateFormat));
   }
 
-  private ContactDto getContact(Contact contact) {
+  private ContactDto getContact(Contact110 contact) {
     return new ContactDto()
         .mobileNumber(contact.getMobileNumber())
         .alternativeNumber(contact.getAlternativeNumber())

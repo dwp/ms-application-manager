@@ -27,10 +27,10 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.messaging.PipcsApiMessagePublisher;
 import uk.gov.dwp.health.pip.application.manager.messaging.properties.InboundEventProperties;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetails100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperForPipcs;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
@@ -47,6 +47,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
@@ -123,7 +124,7 @@ class RegistrationSubmitterTest {
             .state(State.builder().current("REGISTRATION").build())
             .build();
     when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
-    when(registrationDataMarshaller.marshallRegistrationData110(anyString()))
+    when(registrationDataMarshaller.marshallRegistrationData(any()))
         .thenThrow(RegistrationDataNotValid.class);
 
     assertThatThrownBy(() -> registrationSubmitter.submitRegistrationData(APPLICATION_ID))
@@ -137,7 +138,7 @@ class RegistrationSubmitterTest {
     var pip1RegistrationForm = getPip1RegistrationFormFixture();
 
     when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
-    when(registrationDataMarshaller.marshallRegistrationData110("{good data}"))
+    when(registrationDataMarshaller.marshallRegistrationData(any()))
         .thenReturn(registrationSchema);
     when(registrationDataMapper.mapRegistrationData(
             APPLICATION_ID, LocalDate.now(), registrationSchema))
@@ -169,7 +170,7 @@ class RegistrationSubmitterTest {
     var pip1RegistrationForm = getPip1RegistrationFormFixture();
 
     when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
-    when(registrationDataMarshaller.marshallRegistrationData110("{good data}"))
+    when(registrationDataMarshaller.marshallRegistrationData(any()))
         .thenReturn(registrationSchema);
     when(registrationDataMapper.mapRegistrationData(
             APPLICATION_ID, LocalDate.now(), registrationSchema))
@@ -222,8 +223,8 @@ class RegistrationSubmitterTest {
           assertThat(application.getPipcsRegistrationState().getCurrent())
               .isEqualTo(RegistrationState.PENDING.getLabel());
           assertThat(application.getDateRegistrationSubmitted()).isEqualTo(LocalDate.now());
-          AboutYourHealthSchema100 aboutYourHealth =
-              (AboutYourHealthSchema100) application.getHealthDisabilityData().getData();
+          AboutYourHealthSchema110 aboutYourHealth =
+              (AboutYourHealthSchema110) application.getHealthDisabilityData().getData();
           assertThat(aboutYourHealth.getHealthProfessionalsDetails()).hasSize(2);
         });
   }
@@ -256,15 +257,15 @@ class RegistrationSubmitterTest {
         .build();
   }
 
-  private RegistrationSchema110 getRegistrationSchemaFixture() {
-    var registrationSchema = new RegistrationSchema110();
-    var personalDetails = new PersonalDetailsSchema100();
+  private RegistrationSchema120 getRegistrationSchemaFixture() {
+    var registrationSchema = new RegistrationSchema120();
+    var personalDetails = new PersonalDetailsSchema110();
     personalDetails.setFirstname("Azzzam");
     personalDetails.setSurname("Azzzle");
     personalDetails.setNino("RN000006A");
     registrationSchema.setPersonalDetails(personalDetails);
 
-    var aboutYourHealth = new AboutYourHealthSchema100();
+    var aboutYourHealth = new AboutYourHealthSchema110();
     var healthProfessionalsDetails1 = new HealthProfessionalsDetails100();
     var healthProfessionalsDetails2 = new HealthProfessionalsDetails100();
     aboutYourHealth.setHealthProfessionalsDetails(

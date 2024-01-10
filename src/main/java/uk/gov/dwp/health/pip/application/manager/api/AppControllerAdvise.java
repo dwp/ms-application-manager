@@ -11,7 +11,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.exception.HealthDisabilityDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.exception.MessagingEventException;
 import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
@@ -61,11 +60,7 @@ public class AppControllerAdvise {
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
 
-  @ExceptionHandler({
-    RegistrationDataNotValid.class,
-    DateTimeParseException.class,
-    HealthDisabilityDataNotValid.class
-  })
+  @ExceptionHandler({RegistrationDataNotValid.class, DateTimeParseException.class})
   public ResponseEntity<String> handleRegistrationDataNotValid(Exception ex) {
     log.error(ex.getMessage());
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());

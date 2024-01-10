@@ -1,21 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static support.FileUtils.readTestFileAsObject;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -33,11 +17,18 @@ import uk.gov.dwp.health.pip.application.manager.entity.Audit;
 import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
-import uk.gov.dwp.health.pip.application.manager.openapi.healthdisability.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-import uk.gov.dwp.health.pip2.common.Pip2HealthDisabilityForm;
-import uk.gov.dwp.health.pip2.common.model.about.Details;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -66,8 +57,7 @@ class HealthDataSubmitterV2Test {
           .thenReturn(Optional.ofNullable(existingApplication));
       when(clock.instant()).thenReturn(now);
 
-      healthDataSubmitterV2.submitHealthData(
-          "application-id-1", "submission-id-1");
+      healthDataSubmitterV2.submitHealthData("application-id-1", "submission-id-1");
 
       var updatedApplication = captureApplication();
       verifyApplication(updatedApplication);
@@ -77,9 +67,7 @@ class HealthDataSubmitterV2Test {
     void when_application_doesnt_exist_then_not_found() {
       when(applicationRepository.findById("application-id-1")).thenReturn(Optional.empty());
       assertThatThrownBy(
-          () ->
-              healthDataSubmitterV2.submitHealthData(
-                  "application-id-1", "submission-id-1"))
+              () -> healthDataSubmitterV2.submitHealthData("application-id-1", "submission-id-1"))
           .isInstanceOf(ApplicationNotFoundException.class)
           .hasMessage("No application found for provided Application Id");
     }

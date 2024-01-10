@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.BankDetails100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.Contact100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.BankDetails110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.Contact110;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetails100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.MotabilitySchemeSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.carehome.HospitalAndOtherAccomDetails;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.common.Address;
@@ -42,7 +42,7 @@ public class RegistrationDataMapperForPipcs {
   public Pip1RegistrationForm mapRegistrationData(
       String applicationId,
       LocalDate dateRegistrationSubmitted,
-      RegistrationSchema110 registrationSchema) {
+      RegistrationSchema120 registrationSchema) {
 
     YesNoDontKnow altFormatRequiredValue = YesNoDontKnow.NO;
     AltFormat alternateFormatType = null;
@@ -77,7 +77,7 @@ public class RegistrationDataMapperForPipcs {
   }
 
   private static String getMotabilitySchemeInfo(
-      final RegistrationSchema110 registrationSchema) {
+      final RegistrationSchema120 registrationSchema) {
     final MotabilitySchemeSchema100 scheme = registrationSchema.getMotabilityScheme();
     return scheme != null && YesNoDontKnow.YES.toString().equalsIgnoreCase(
         scheme.getReceiveMotabilityInformation()
@@ -87,8 +87,8 @@ public class RegistrationDataMapperForPipcs {
     ) ? YesNoDontKnow.NO.toString() : null;
   }
 
-  private BankDetails getBankDetails(final RegistrationSchema110 registrationSchema) {
-    final BankDetails100 bankDetails = registrationSchema.getPersonalDetails().getBankDetails();
+  private BankDetails getBankDetails(final RegistrationSchema120 registrationSchema) {
+    final BankDetails110 bankDetails = registrationSchema.getPersonalDetails().getBankDetails();
     return bankDetails != null
         && YesNoDontKnow.YES.toString().equalsIgnoreCase(bankDetails.getEnterBankDetails())
         ? BankDetails.builder()
@@ -102,12 +102,12 @@ public class RegistrationDataMapperForPipcs {
         : null;
   }
 
-  private YesNoDontKnow getHelpWithCommunication(RegistrationSchema110 registrationSchema) {
+  private YesNoDontKnow getHelpWithCommunication(RegistrationSchema120 registrationSchema) {
     return toYesNoDontKnow(registrationSchema.getAdditionalSupport().getHelpCommunicating());
   }
 
-  private PersonalDetails getPersonalDetails(RegistrationSchema110 registrationSchema) {
-    PersonalDetailsSchema100 personalDetails = registrationSchema.getPersonalDetails();
+  private PersonalDetails getPersonalDetails(RegistrationSchema120 registrationSchema) {
+    PersonalDetailsSchema110 personalDetails = registrationSchema.getPersonalDetails();
 
     return PersonalDetails.builder()
         .firstName(personalDetails.getFirstname())
@@ -138,13 +138,13 @@ public class RegistrationDataMapperForPipcs {
         .build();
   }
 
-  private YesNoDontKnow getHelpCompletingLetters(RegistrationSchema110 registrationSchema) {
+  private YesNoDontKnow getHelpCompletingLetters(RegistrationSchema120 registrationSchema) {
     return registrationSchema.getAdditionalSupport().getHelperDetails() != null
         ? YesNoDontKnow.YES
         : YesNoDontKnow.NO;
   }
 
-  private String getHelpCompletingLettersWho(RegistrationSchema110 registrationSchema) {
+  private String getHelpCompletingLettersWho(RegistrationSchema120 registrationSchema) {
     AtomicReference<String> who = new AtomicReference<>();
     Optional.ofNullable(registrationSchema.getAdditionalSupport().getHelperDetails())
         .ifPresent(
@@ -153,8 +153,8 @@ public class RegistrationDataMapperForPipcs {
     return who.get();
   }
 
-  private ContactDetails getContactDetails(RegistrationSchema110 registrationSchema) {
-    Contact100 contactDetails = registrationSchema.getPersonalDetails().getContact();
+  private ContactDetails getContactDetails(RegistrationSchema120 registrationSchema) {
+    Contact110 contactDetails = registrationSchema.getPersonalDetails().getContact();
     YesNoDontKnow smsOptAnswer = toYesNoDontKnow(contactDetails.getSmsUpdates());
     return ContactDetails.builder()
         .mobilePhoneNumber(contactDetails.getMobileNumber())
@@ -167,7 +167,7 @@ public class RegistrationDataMapperForPipcs {
         .build();
   }
 
-  private AltFormat getAlternateFormatType(RegistrationSchema110 registrationSchema) {
+  private AltFormat getAlternateFormatType(RegistrationSchema120 registrationSchema) {
     Map<String, Object> additionalProperties =
         registrationSchema.getPersonalDetails().getAlternateFormat().getAdditionalProperties();
 
@@ -180,7 +180,7 @@ public class RegistrationDataMapperForPipcs {
     return alternateFormatLegacyValue.map(AltFormat::fromValue).orElse(null);
   }
 
-  private String getAltFormatAdditionalInfo(RegistrationSchema110 registrationSchema) {
+  private String getAltFormatAdditionalInfo(RegistrationSchema120 registrationSchema) {
     return (String)
         registrationSchema
             .getPersonalDetails()
@@ -189,11 +189,9 @@ public class RegistrationDataMapperForPipcs {
             .get("alternateFormatAdditionalInfo");
   }
 
-  private HealthDetails getHealthDetails(RegistrationSchema110 registrationSchema) {
+  private HealthDetails getHealthDetails(RegistrationSchema120 registrationSchema) {
     final var yourHealth = registrationSchema.getAboutYourHealth();
-    final var consent =
-        yourHealth.getHcpContactConsent()
-            && (yourHealth.getHcpContactConsent() ? yourHealth.getHcpShareConsent() : false);
+    final var consent = yourHealth.getHcpShareConsent();
     final var condition = getHealthConditions(yourHealth.getHealthConditions());
     final var healthProfessionalsDetails = yourHealth.getHealthProfessionalsDetails();
 
@@ -243,7 +241,7 @@ public class RegistrationDataMapperForPipcs {
   }
 
   private HospitalAndOtherAccomDetails getHospitalAndOtherAccomDetails(
-      RegistrationSchema110 registrationSchema) {
+      RegistrationSchema120 registrationSchema) {
     HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome =
         registrationSchema.getAboutYourHealth().getHospitalHospiceOrCarehome();
 

@@ -10,7 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import uk.gov.dwp.health.mongo.changestream.config.properties.WatcherConfigProperties;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)

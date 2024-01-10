@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupport;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupportSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 
 import java.io.IOException;
 
@@ -18,13 +18,13 @@ import static support.FileUtils.getRegistrationDataFromFile;
 class AdditionalSupportMapperV2Test {
 
   private AdditionalSupportMapperV2 additionalSupportMapperV2;
-  private AdditionalSupport additionalSupport;
+  private AdditionalSupportSchema100 additionalSupport;
 
   @BeforeEach
   void beforeEach() throws IOException {
     additionalSupportMapperV2 = new AdditionalSupportMapperV2();
 
-    RegistrationSchema100 registrationSchema =
+    RegistrationSchema120 registrationSchema =
         getRegistrationDataFromFile("mapping/validRegistrationData.json");
 
     additionalSupport = registrationSchema.getAdditionalSupport();

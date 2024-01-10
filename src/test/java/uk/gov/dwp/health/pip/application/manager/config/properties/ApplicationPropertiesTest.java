@@ -61,7 +61,7 @@ class ApplicationPropertiesTest {
   @Test
   @DisplayName("test default registration default value")
   void testDefaultRegistrationDefaultValue() {
-    assertThat(underTest.getRegistrationFormSchemaVersion()).isEqualTo("1.0.0");
+    assertThat(underTest.getRegistrationFormSchemaVersion()).isEqualTo("1.2.0");
   }
 
   @Test

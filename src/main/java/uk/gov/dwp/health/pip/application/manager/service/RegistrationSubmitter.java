@@ -18,8 +18,8 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.messaging.PipcsApiMessagePublisher;
 import uk.gov.dwp.health.pip.application.manager.messaging.properties.InboundEventProperties;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperForPipcs;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
@@ -49,7 +49,7 @@ public class RegistrationSubmitter {
   public void submitRegistrationData(String applicationId) {
     Application application = getApplication(applicationId);
     isAllowedSubmitRegistration(application);
-    RegistrationSchema110 registrationSchema = marshallRegistrationData(application);
+    RegistrationSchema120 registrationSchema = marshallRegistrationData(application);
     setClaimantDetails(registrationSchema, application);
     setDateRegistrationSubmitted(application);
     Pip1RegistrationForm pip1RegistrationForm =
@@ -71,15 +71,18 @@ public class RegistrationSubmitter {
                     "No application found against provided Application ID"));
   }
 
-  private void setClaimantDetails(RegistrationSchema110 registrationData, Application application) {
+  private void setClaimantDetails(
+      RegistrationSchema120 registrationData, Application application
+  ) {
     application.setForename(registrationData.getPersonalDetails().getFirstname());
     application.setSurname(registrationData.getPersonalDetails().getSurname());
     application.setNino(registrationData.getPersonalDetails().getNino());
   }
 
-  private RegistrationSchema110 marshallRegistrationData(Application application) {
-    return registrationDataMarshaller.marshallRegistrationData110(
-        application.getRegistrationData().getData());
+  private RegistrationSchema120 marshallRegistrationData(Application application) {
+    return registrationDataMarshaller.marshallRegistrationData(
+        application.getRegistrationData().getData()
+    );
   }
 
   private void setDateRegistrationSubmitted(Application application) {
@@ -87,7 +90,7 @@ public class RegistrationSubmitter {
   }
 
   private Pip1RegistrationForm mapRegistrationData(
-      Application application, RegistrationSchema110 registrationSchema) {
+      Application application, RegistrationSchema120 registrationSchema) {
     return registrationDataMapper.mapRegistrationData(
         application.getId(), application.getDateRegistrationSubmitted(), registrationSchema);
   }
@@ -158,14 +161,14 @@ public class RegistrationSubmitter {
   }
 
   private void setHealthDisabilityFormData(
-      RegistrationSchema110 registrationSchema110, Application application) {
-    var aboutYourHealthFromRegistration = registrationSchema110.getAboutYourHealth();
+      RegistrationSchema120 registrationSchema, Application application) {
+    var aboutYourHealthFromRegistration = registrationSchema.getAboutYourHealth();
     var healthProfessionalsDetailsList =
         aboutYourHealthFromRegistration != null
             ? aboutYourHealthFromRegistration.getHealthProfessionalsDetails()
             : null;
 
-    var aboutYourHealth = new AboutYourHealthSchema100();
+    var aboutYourHealth = new AboutYourHealthSchema110();
     aboutYourHealth.setHealthProfessionalsDetails(
         healthProfessionalsDetailsList != null
             ? List.copyOf(healthProfessionalsDetailsList)

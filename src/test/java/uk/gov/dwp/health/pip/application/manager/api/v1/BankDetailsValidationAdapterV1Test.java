@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.dwp.health.pip.application.manager.entity.BankDetailsValidityList;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity;
 import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.dto.AccountDetails;
-import uk.gov.dwp.health.pip.application.manager.openapi.healthdisability.v1.dto.HealthDisabilityDto;
 import uk.gov.dwp.health.pip.application.manager.service.BankDetailsValidator;
 
 import java.util.LinkedList;
@@ -30,7 +29,6 @@ class BankDetailsValidationAdapterV1Test {
   public static final String ACCOUNT_NUMBER = "1";
   public static final String SORT_CODE = "2";
   public static final String ROLL_NUMBER = "3";
-  public static final String CORRELATION_ID = "4";
   public static final String INVALID_ACCOUNT_NUMBER = "5";
 
   @InjectMocks private BankDetailsValidationAdapterV1 bankDetailsValidationAdapterV2;
@@ -38,9 +36,6 @@ class BankDetailsValidationAdapterV1Test {
 
   @Test
   void validDetails() {
-    var healthDisabilityDto = new HealthDisabilityDto();
-    healthDisabilityDto.applicationId("application-id-1");
-
     final BankDetailsValidityList result = new BankDetailsValidityList();
     result.addResult(BankDetailsValidity.VALID);
     when(bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER)).thenReturn(result);
@@ -56,28 +51,25 @@ class BankDetailsValidationAdapterV1Test {
     assertThat(responseEntity.getBody().getClass()).isEqualTo(LinkedList.class);
     assertThat(responseEntity.getBody().size()).isEqualTo(1);
     assertThat(responseEntity.getBody().get(0)).isEqualTo("VALID");
-
   }
 
   @Test
   void invalidDetails() {
-    var healthDisabilityDto = new HealthDisabilityDto();
-    healthDisabilityDto.applicationId("application-id-1");
-
     final BankDetailsValidityList invalidAccountResult = new BankDetailsValidityList();
     invalidAccountResult.addResult(BankDetailsValidity.INVALID_ACCOUNT_COMBINATION);
     invalidAccountResult.addResult(BankDetailsValidity.INVALID_ROLL_NUMBER);
-    when(bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER)).thenReturn(invalidAccountResult);
+    when(bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER))
+        .thenReturn(invalidAccountResult);
 
     final AccountDetails invalidAccount = new AccountDetails();
     invalidAccount.setAccountNumber(INVALID_ACCOUNT_NUMBER);
     invalidAccount.setSortCode(SORT_CODE);
     invalidAccount.setRollNumber(ROLL_NUMBER);
-    ResponseEntity<List<String>> invalidResponseEntity = bankDetailsValidationAdapterV2.validate(invalidAccount);
+    ResponseEntity<List<String>> invalidResponseEntity =
+        bankDetailsValidationAdapterV2.validate(invalidAccount);
 
     assertThat(invalidResponseEntity.getBody().size()).isEqualTo(2);
     assertThat(invalidResponseEntity.getBody().get(0)).isEqualTo("INVALID_ACCOUNT_COMBINATION");
     assertThat(invalidResponseEntity.getBody().get(1)).isEqualTo("INVALID_ROLL_NUMBER");
   }
-
 }

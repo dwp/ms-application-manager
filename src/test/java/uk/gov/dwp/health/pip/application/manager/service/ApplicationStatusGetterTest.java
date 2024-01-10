@@ -15,8 +15,8 @@ import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetails;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 import java.util.Collections;
@@ -132,18 +132,18 @@ class ApplicationStatusGetterTest {
     assertThat(applicationStatusDto.getPostcode()).isEqualTo("postcode-1");
   }
 
-  private RegistrationSchema100 getRegistrationSchemaFixture() {
+  private RegistrationSchema120 getRegistrationSchemaFixture() {
     var addressSchema = new AddressSchema100();
     addressSchema.setPostcode("postcode-1");
 
-    var personalDetails = new PersonalDetails();
+    var personalDetails = new PersonalDetailsSchema110();
     personalDetails.setSurname("surname-1");
     personalDetails.setFirstname("forename-1");
     personalDetails.setDob("date-of-birth-1");
     personalDetails.setNino("nino-1");
     personalDetails.setAddress(addressSchema);
 
-    var registrationSchema = new RegistrationSchema100();
+    var registrationSchema = new RegistrationSchema120();
     registrationSchema.setPersonalDetails(personalDetails);
 
     return registrationSchema;

@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,14 +27,26 @@ class RegistrationDataMarshallerTest {
   @Test
   void when_valid() throws IOException {
     Map<String, Object> map = readTestFile("mapping/validRegistrationData.json");
-    final RegistrationSchema100 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
+    final RegistrationSchema120 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
     assertThat(registrationSchema.getPersonalDetails().getSurname()).isEqualTo("Azzzle");
   }
 
   @Test
   void when_valid110() throws IOException {
     Map<String, Object> map = readTestFile("mapping/validRegistrationData.json");
-    final RegistrationSchema110 registrationSchema = registrationDataMarshaller.marshallRegistrationData110(map);
+    final RegistrationSchema120 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
+    assertThat(registrationSchema.getPersonalDetails().getSurname()).isEqualTo("Azzzle");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getEnterBankDetails()).isNotNull();
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountName")).isEqualTo("Bank of Yorkshire");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountNumber")).isEqualTo("12341234");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("sortCode")).isEqualTo("123123");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("rollNumber")).isEqualTo("123123123");
+  }
+
+  @Test
+  void when_valid120() throws IOException {
+    Map<String, Object> map = readTestFile("mapping/validRegistrationData.json");
+    final RegistrationSchema120 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
     assertThat(registrationSchema.getPersonalDetails().getSurname()).isEqualTo("Azzzle");
     assertThat(registrationSchema.getPersonalDetails().getBankDetails().getEnterBankDetails()).isNotNull();
     assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountName")).isEqualTo("Bank of Yorkshire");
@@ -47,17 +58,15 @@ class RegistrationDataMarshallerTest {
   @Test
   void when_bank_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/bankDetailsMissing.json");
-    assertThatThrownBy(() -> registrationDataMarshaller.marshallRegistrationData110(map))
-        .isInstanceOf(RegistrationDataNotValid.class)
-        .hasMessage("Registration data not valid. Constraint violations present.");
+    final RegistrationSchema120 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
+    assertThat(registrationData).isNotNull();
   }
 
   @Test
   void when_motability_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/motabilityDetailsMissing.json");
-    assertThatThrownBy(() -> registrationDataMarshaller.marshallRegistrationData110(map))
-        .isInstanceOf(RegistrationDataNotValid.class)
-        .hasMessage("Registration data not valid. Constraint violations present.");
+    final RegistrationSchema120 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
+    assertThat(registrationData).isNotNull();
   }
 
   @Test

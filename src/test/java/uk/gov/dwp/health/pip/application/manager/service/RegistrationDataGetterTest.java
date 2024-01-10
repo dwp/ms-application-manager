@@ -1,6 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +19,7 @@ import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.Reg
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;

@@ -7,18 +7,18 @@
     <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>2.7.16</version>
+      <version>2.7.18</version>
       <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>uk.gov.dwp.health.pip</groupId>
     <artifactId>ms-application-manager</artifactId>
-    <version>2.6.0</version>
+    <version>2.8.0</version>
     <name>ms-pip-application-manager</name>
     <description>Strategic pip-apply micro service handle applicant application</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <client.base.package.name>uk.gov.dwp.health.pip.application.manager</client.base.package.name>
@@ -29,12 +29,11 @@
         <dwp-meta-data-logger.version>2.0.0-56b86a2e</dwp-meta-data-logger.version>
         <gson-fire.version>1.8.5</gson-fire.version>
         <pipcs-api-model.version>1.1.0-72d189de</pipcs-api-model.version>
-        <pip2-health-disability-model.version>1.3.1-97c80538</pip2-health-disability-model.version>
         <guava.version>31.1-jre</guava.version>
         <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
         <openapi-codegen-maven-plugin.version>5.2.1</openapi-codegen-maven-plugin.version>
         <jackson-nullable.version>0.2.4</jackson-nullable.version>
-        <amazon.sdk.version>1.12.415</amazon.sdk.version>
+        <amazon.sdk.version>1.12.567</amazon.sdk.version>
         <lidalia.version>1.2.0</lidalia.version>
         <plugin.maven.compiler.version>3.10.1</plugin.maven.compiler.version>
         <plugin.spotbugs.version>4.7.3.0</plugin.spotbugs.version>
@@ -55,18 +54,24 @@
         <easy-random-core.version>5.0.0</easy-random-core.version>
         <testTags>unit</testTags>
         <flapdoodle.version>3.5.2</flapdoodle.version>
-        <restassured.version>4.5.1</restassured.version>
+        <restassured.version>5.3.2</restassured.version>
         <restassured.extent.report.plugin.version>2.1.2</restassured.extent.report.plugin.version>
         <qa-tools-properties.version>2.0.RC6</qa-tools-properties.version>
-        <allure.version>2.20.1</allure.version>
+        <allure.version>2.24.0</allure.version>
         <extentreport-allure-annotation.version>1.0.2</extentreport-allure-annotation.version>
         <java-faker.version>1.0.2</java-faker.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <micrometer.version>1.10.3</micrometer.version>
-        <tomcat.version>9.0.82</tomcat.version>
         <plexus.version>3.5.1</plexus.version>
+        <opentelemetry.version>1.32.0-alpha</opentelemetry.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-aws-sdk-2.2-autoconfigure</artifactId>
+            <version>${opentelemetry.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>uk.gov.dwp.health.logging</groupId>
             <artifactId>dwp-meta-data-logger</artifactId>
@@ -147,11 +152,6 @@
             <version>${pipcs-api-model.version}</version>
         </dependency>
         <dependency>
-            <groupId>uk.gov.dwp.health.pip2.common</groupId>
-            <artifactId>pip2-html-models</artifactId>
-            <version>${pip2-health-disability-model.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
@@ -222,6 +222,12 @@
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy-xml</artifactId>
                 </exclusion></exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured-common</artifactId>
+            <version>${restassured.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
@@ -436,6 +442,8 @@
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v2/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v3/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v3/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/dto/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/entity/enums/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/event/model/**</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/model/**</exclude>
@@ -760,10 +768,9 @@
                             <includeAdditionalProperties>true</includeAdditionalProperties>
                             <includeJsr303Annotations>true</includeJsr303Annotations>
                             <sourcePaths>
-                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.0.0.json
-                                </sourcePath>
-                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.1.0.json
-                                </sourcePath>
+                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.0.0.json</sourcePath>
+                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.1.0.json</sourcePath>
+                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.2.0.json</sourcePath>
                             </sourcePaths>
                             <targetPackage>uk.gov.dwp.health.pip.application.manager.model.registration.data
                             </targetPackage>

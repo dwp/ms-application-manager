@@ -1,13 +1,13 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
 import org.springframework.stereotype.Component;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresence;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.ResidenceAndPresenceDto;
 
 @Component
 class ResidenceAndPresenceMapperV2 {
 
-  ResidenceAndPresenceDto toDto(ResidenceAndPresence residenceAndPresence) {
+  ResidenceAndPresenceDto toDto(ResidenceAndPresenceSchema100 residenceAndPresence) {
     return new ResidenceAndPresenceDto()
         .nationality(residenceAndPresence.getNationality())
         .residentBeforeBrexit(getResidentBeforeBrexit(residenceAndPresence))
@@ -17,13 +17,13 @@ class ResidenceAndPresenceMapperV2 {
         .payingInsuranceEEA(residenceAndPresence.getPayingInsuranceEEA());
   }
 
-  private String getResidentBeforeBrexit(ResidenceAndPresence residenceAndPresence) {
+  private String getResidentBeforeBrexit(ResidenceAndPresenceSchema100 residenceAndPresence) {
     return residenceAndPresence.getResidentBeforeBrexit() == null
         ? null
         : residenceAndPresence.getResidentBeforeBrexit().value();
   }
 
-  private String getInUkTwoOutOfThreeYears(ResidenceAndPresence residenceAndPresence) {
+  private String getInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100 residenceAndPresence) {
     return residenceAndPresence.getInUkTwoOutOfThreeYears() == null
         ? null
         : residenceAndPresence.getInUkTwoOutOfThreeYears().value();

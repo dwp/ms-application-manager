@@ -1,10 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
@@ -16,10 +11,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperV3;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -37,13 +38,13 @@ class RegistrationDataGetterV3Test {
         Application.builder()
             .registrationData(FormData.builder().data("{registration form data}").build())
             .build();
-    var registrationSchema100 = new RegistrationSchema100();
+    var registrationSchema = new RegistrationSchema120();
     var expectedRegistrationDto = new RegistrationDto();
 
     when(applicationRepository.findById("application-id-1")).thenReturn(Optional.of(application));
     when(registrationDataMarshaller.marshallRegistrationData("{registration form data}"))
-        .thenReturn(registrationSchema100);
-    when(registrationDataMapperV3.toDto(application, registrationSchema100))
+        .thenReturn(registrationSchema);
+    when(registrationDataMapperV3.toDto(application, registrationSchema))
         .thenReturn(expectedRegistrationDto);
 
     var registrationDto =

@@ -13,10 +13,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import support.FileUtils;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat100.FormatType;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110.FormatType;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HelperDetails100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.YesNoDontKnow;
 
@@ -37,7 +37,7 @@ class RegistrationDataMapperForPipcsTest {
   private static final LocalDate DATE_REGISTRATION_SUBMITTED = LocalDate.now();
 
   private RegistrationDataMapperForPipcs registrationDataMapper;
-  private RegistrationSchema110 registrationSchema;
+  private RegistrationSchema120 registrationSchema;
 
   @Mock private HospitalAndOtherAccomDetailsMapper hospitalAndOtherAccomDetailsMapper;
   @Mock private ResidencyDetailsMapper residencyDetailsMapper;
@@ -347,7 +347,7 @@ class RegistrationDataMapperForPipcsTest {
 
     @Test
     void when_incomplete() {
-      AlternateFormat100 alternateFormat =
+      AlternateFormat110 alternateFormat =
           registrationSchema.getPersonalDetails().getAlternateFormat();
       alternateFormat.setFormatType(FormatType.OTHER);
       alternateFormat.getAdditionalProperties().clear();
@@ -437,15 +437,15 @@ class RegistrationDataMapperForPipcsTest {
   }
 
   private void setUpAlternativeFormatAdditionalProperties(
-      AlternateFormat100.FormatType type, String key, String value) {
-    AlternateFormat100 alternateFormat = registrationSchema.getPersonalDetails().getAlternateFormat();
+      AlternateFormat110.FormatType type, String key, String value) {
+    AlternateFormat110 alternateFormat = registrationSchema.getPersonalDetails().getAlternateFormat();
     alternateFormat.getAdditionalProperties().clear();
     alternateFormat.setFormatType(type);
     alternateFormat.setAdditionalProperty(key, value);
   }
 
-  private RegistrationSchema110 parseJson(Map<String, Object> registrationDataJson) {
+  private RegistrationSchema120 parseJson(Map<String, Object> registrationDataJson) {
     ObjectMapper objectMapper = new ObjectMapper();
-    return objectMapper.convertValue(registrationDataJson, RegistrationSchema110.class);
+    return objectMapper.convertValue(registrationDataJson, RegistrationSchema120.class);
   }
 }

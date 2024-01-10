@@ -3,7 +3,7 @@ package uk.gov.dwp.health.pip.application.manager.service.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AddressDto;
 
 @Component
@@ -26,7 +26,7 @@ class AddressMapperV3 {
         .country(addressSchema100.getCountry().value());
   }
 
-  AddressDto getAddress(HospitalHospiceOrCarehome hospitalHospiceOrCarehome) {
+  AddressDto getAddress(HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
     var addressObject = formCommons.getCareAccommodationAddressFromForm(hospitalHospiceOrCarehome);
     var addressSchema = formCommons.marshallAddress(addressObject);
 

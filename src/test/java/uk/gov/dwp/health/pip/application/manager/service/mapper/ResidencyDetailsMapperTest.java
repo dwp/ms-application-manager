@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.ResidentBeforeBrexit;
 
@@ -14,20 +14,20 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static support.FileUtils.getRegistrationSchema110DataFromFile;
+import static support.FileUtils.getRegistrationDataFromFile;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Tag("unit")
 class ResidencyDetailsMapperTest {
 
-  private RegistrationSchema110 registrationSchema;
+  private RegistrationSchema120 registrationSchema;
   private ResidencyDetailsMapper residencyDetailsMapper;
 
   @BeforeEach
   void beforeEach() throws IOException {
     residencyDetailsMapper = new ResidencyDetailsMapper();
 
-    registrationSchema = getRegistrationSchema110DataFromFile("mapping/validRegistrationData.json");
+    registrationSchema = getRegistrationDataFromFile("mapping/validRegistrationData.json");
   }
 
   @Test

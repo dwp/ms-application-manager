@@ -9,11 +9,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealth;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupport;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetails;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresence;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupportSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AdditionalSupportDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.PersonalDetailsDto;
@@ -40,23 +40,23 @@ class RegistrationDataMapperV2Test {
   void when_mapping_form_to_api() {
     var application = Application.builder().dateRegistrationSubmitted(LocalDate.now()).build();
 
-    RegistrationSchema100 registrationSchema100 = getRegistrationData();
+    RegistrationSchema120 registrationSchema = getRegistrationData();
 
     var personalDetailsDto = new PersonalDetailsDto();
     var aboutYourHealthDto = new AboutYourHealthDto();
     var residenceAndPresenceDto = new ResidenceAndPresenceDto();
     var additionalSupportDto = new AdditionalSupportDto();
 
-    when(personalDetailsMapperV2.toDto(registrationSchema100.getPersonalDetails()))
+    when(personalDetailsMapperV2.toDto(registrationSchema.getPersonalDetails()))
         .thenReturn(personalDetailsDto);
-    when(aboutYourHealthMapperV2.toDto(registrationSchema100.getAboutYourHealth()))
+    when(aboutYourHealthMapperV2.toDto(registrationSchema.getAboutYourHealth()))
         .thenReturn(aboutYourHealthDto);
-    when(residenceAndPresenceMapperV2.toDto(registrationSchema100.getResidenceAndPresence()))
+    when(residenceAndPresenceMapperV2.toDto(registrationSchema.getResidenceAndPresence()))
         .thenReturn(residenceAndPresenceDto);
-    when(additionalSupportMapperV2.toDto(registrationSchema100.getAdditionalSupport()))
+    when(additionalSupportMapperV2.toDto(registrationSchema.getAdditionalSupport()))
         .thenReturn(additionalSupportDto);
 
-    var registrationDto = registrationDataMapperV2.toDto(application, registrationSchema100);
+    var registrationDto = registrationDataMapperV2.toDto(application, registrationSchema);
 
     assertThat(registrationDto.getSubmissionDate()).isEqualTo(LocalDate.now().toString());
     assertThat(registrationDto.getPersonalDetails()).isEqualTo(personalDetailsDto);
@@ -65,16 +65,16 @@ class RegistrationDataMapperV2Test {
     assertThat(registrationDto.getAdditionalSupport()).isEqualTo(additionalSupportDto);
   }
 
-  private RegistrationSchema100 getRegistrationData() {
-    var registrationSchema100 = new RegistrationSchema100();
-    var personalDetails = new PersonalDetails();
-    var aboutYourHealth = new AboutYourHealth();
-    var residenceAndPresence = new ResidenceAndPresence();
-    var additionalSupport = new AdditionalSupport();
-    registrationSchema100.setPersonalDetails(personalDetails);
-    registrationSchema100.setAboutYourHealth(aboutYourHealth);
-    registrationSchema100.setResidenceAndPresence(residenceAndPresence);
-    registrationSchema100.setAdditionalSupport(additionalSupport);
-    return registrationSchema100;
+  private RegistrationSchema120 getRegistrationData() {
+    var registrationSchema = new RegistrationSchema120();
+    var personalDetails = new PersonalDetailsSchema110();
+    var aboutYourHealth = new AboutYourHealthSchema110();
+    var residenceAndPresence = new ResidenceAndPresenceSchema100();
+    var additionalSupport = new AdditionalSupportSchema100();
+    registrationSchema.setPersonalDetails(personalDetails);
+    registrationSchema.setAboutYourHealth(aboutYourHealth);
+    registrationSchema.setResidenceAndPresence(residenceAndPresence);
+    registrationSchema.setAdditionalSupport(additionalSupport);
+    return registrationSchema;
   }
 }

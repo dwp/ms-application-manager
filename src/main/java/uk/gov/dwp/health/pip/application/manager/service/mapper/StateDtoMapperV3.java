@@ -1,7 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.dwp.health.pip.application.manager.entity.History;
@@ -10,6 +8,9 @@ import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.His
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.HistoryDto.StateEnum;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.StateDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.StateDto.CurrentStateEnum;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor

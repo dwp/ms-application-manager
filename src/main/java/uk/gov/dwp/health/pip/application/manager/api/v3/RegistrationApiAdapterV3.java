@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.V3Api;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationDataGetterV3;
 
 @Controller

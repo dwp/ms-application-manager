@@ -106,6 +106,7 @@ class ApplicationCreatorTest {
     assertThat(application.getPipcsRegistrationState()).isNotNull();
     assertThat(application.getState().getCurrent()).isEqualTo("REGISTRATION");
     assertThat(application.getRegistrationData().getData()).isNull();
+    assertThat(application.getRegistrationData().getSchemaVersion()).isNull();
     assertThat(application.getSubmissionId()).isNull();
     assertThat(application.getDrsRequestId()).isNull();
     assertThat(application.getHealthDisabilityData()).isNull();

@@ -1,10 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static support.FileUtils.getRegistrationDataFromFile;
-
-import java.io.IOException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -15,8 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.PersonalDetailsDto;
+
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static support.FileUtils.getRegistrationDataFromFile;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +26,7 @@ class PersonalDetailsMapperV3Test {
   @Mock
   private AlternateFormatMapperV3 alternateFormatMapperV3;
   private PersonalDetailsMapperV3 personalDetailsMapperV3;
-  private RegistrationSchema100 registrationSchema;
+  private RegistrationSchema120 registrationSchema;
 
   @BeforeEach
   void beforeEach() {

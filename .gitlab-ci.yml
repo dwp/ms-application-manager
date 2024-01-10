@@ -3,7 +3,7 @@ variables:
   PRODUCT: pip-apply
   # Config
   BUILD_TYPE: MAVEN
-  MAVEN_IMAGE: "maven:3-jdk-11"
+  MAVEN_IMAGE: "maven:3-openjdk-17"
   MVN_OPTS: "-DLOG_LEVEL=INFO"
   MVN_CLI_OPTS: "--batch-mode"
   REPO_OWNER: "Team Goldcrest"
@@ -41,6 +41,12 @@ required-fragment-check:
   variables:
     RULESET: MAVEN_CI
 
+docker-build:
+  extends: .docker-build-template
+  before_script:
+    - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
 create-develop-nightly-schedule:
   extends: .add-schedule
   variables:
@@ -57,6 +63,8 @@ create-develop-nightly-schedule:
     - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - export GITLAB_IMAGE="$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:${CI_COMMIT_SHA:0:8}"
     - export MOCK_IMAGE=$(aws ssm get-parameter --name "/artifact/$PRODUCT/$PIP_APPLY_MOCKS_NAME/$MOCK_IMAGE" --with-decryption --output json | jq --raw-output '.Parameter.Value')
+    - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 api-test:
   allow_failure: false

@@ -16,7 +16,9 @@ import uk.gov.dwp.health.pip.application.manager.responsemodels.CreatedApplicati
 import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.*;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationSubmissionUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationUrl;
 
 public class PutApplicationSubmissionIT extends ApiTest {
   CreatedApplication application;
@@ -62,7 +64,7 @@ public class PutApplicationSubmissionIT extends ApiTest {
   }
 
   @Test
-  public void shouldReturn422StatusCodeWhenBankDetailsNotPresent() {
+  public void shouldReturn202StatusCodeWhenBankDetailsNotPresent() {
     PersonalDetails personalDetails = PersonalDetails.builder().bankDetails(null).build();
     FormData formData = FormData.builder().personalDetails(personalDetails).build();
     UpdateRegistration updatedRegistration =
@@ -71,11 +73,11 @@ public class PutApplicationSubmissionIT extends ApiTest {
 
     int actualResponseCode = putRequest(submissionURL, updatedRegistration).statusCode();
 
-    assertThat(actualResponseCode).isEqualTo(422);
+    assertThat(actualResponseCode).isEqualTo(202).as("Bank details now nullable to allow reading old data");
   }
 
   @Test
-  public void shouldReturn422StatusCodeWhenMotabilityDetailsNotPresent() {
+  public void shouldReturn202StatusCodeWhenMotabilityDetailsNotPresent() {
     FormData formData = FormData.builder().motabilityScheme(null).build();
     UpdateRegistration updatedRegistration =
         UpdateRegistration.builder().formData(formData).build();
@@ -83,7 +85,7 @@ public class PutApplicationSubmissionIT extends ApiTest {
 
     int actualResponseCode = putRequest(submissionURL, updatedRegistration).statusCode();
 
-    assertThat(actualResponseCode).isEqualTo(422);
+    assertThat(actualResponseCode).isEqualTo(202).as("Motability details now nullable to allow reading old data");
   }
 
   @Test

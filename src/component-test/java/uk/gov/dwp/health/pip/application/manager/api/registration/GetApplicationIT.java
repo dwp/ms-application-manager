@@ -20,7 +20,8 @@ public class GetApplicationIT extends ApiTest {
 
   @BeforeEach
   public void createApplicationData() {
-    Registration registration = Registration.builder().claimantId(RandomStringUtil.generate(24)).build();
+    Registration registration =
+        Registration.builder().claimantId(RandomStringUtil.generate(24)).build();
     postRequest(buildPostApplicationUrl(), registration);
     url = buildGetRegistrationUrl(registration.getClaimantId());
   }
@@ -44,7 +45,8 @@ public class GetApplicationIT extends ApiTest {
 
   @Test
   public void shouldReturn404StatusCodeWhenTheClaimantIdIsNotFound() {
-    int actualResponseCode = getRequest(buildGetRegistrationUrl(RandomStringUtil.generate(24))).statusCode();
+    int actualResponseCode =
+        getRequest(buildGetRegistrationUrl(RandomStringUtil.generate(24))).statusCode();
 
     assertThat(actualResponseCode).isEqualTo(404);
   }

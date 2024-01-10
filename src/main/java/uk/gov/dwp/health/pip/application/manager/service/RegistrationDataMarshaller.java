@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -21,28 +20,18 @@ public class RegistrationDataMarshaller {
 
   private final ObjectMapper objectMapper;
 
-  RegistrationSchema100 marshallRegistrationData(Object registrationData) {
-    RegistrationSchema100 registrationSchema = getRegistrationSchema(registrationData);
+  RegistrationSchema120 marshallRegistrationData(Object registrationData) {
+    RegistrationSchema120 registrationSchema = getRegistrationSchema120(registrationData);
 
-    validate(registrationSchema);
-
-    return registrationSchema;
-  }
-
-  RegistrationSchema110 marshallRegistrationData110(Object registrationData) {
-    RegistrationSchema110 registrationSchema = getRegistrationSchema110(registrationData);
-
-    validate(registrationSchema);
+    if (registrationSchema != null) {
+      validate(registrationSchema);
+    }
 
     return registrationSchema;
   }
 
-  private RegistrationSchema110 getRegistrationSchema110(Object registrationData) {
-    return getRegistrationSchema(registrationData, RegistrationSchema110.class);
-  }
-
-  private RegistrationSchema100 getRegistrationSchema(Object registrationData) {
-    return getRegistrationSchema(registrationData, RegistrationSchema100.class);
+  private RegistrationSchema120 getRegistrationSchema120(Object registrationData) {
+    return getRegistrationSchema(registrationData, RegistrationSchema120.class);
   }
 
   private <T> T getRegistrationSchema(Object registrationData, Class<T> registrationSchemaVersion) {
@@ -51,7 +40,11 @@ public class RegistrationDataMarshaller {
       return objectMapper.readValue(bytes, registrationSchemaVersion);
     } catch (IOException e) {
       log.debug(
-          "Registration data not valid. Problem when marshalling to objects. {}", e.getMessage());
+          "Registration data not valid. Problem when marshalling to objects.", e
+      );
+      log.error(
+          "Registration data not valid. Problem when marshalling to objects."
+      );
       throw new RegistrationDataNotValid(
           "Registration data not valid. Problem when marshalling to objects.");
     }
@@ -65,7 +58,7 @@ public class RegistrationDataMarshaller {
     if (!constraintViolations.isEmpty()) {
       log.error(
           "Registration data not valid. Constraint violations present. {}",
-          constraintViolations.toString());
+          constraintViolations);
       throw new RegistrationDataNotValid(
           "Registration data not valid. Constraint violations present.");
     }

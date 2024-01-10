@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresence;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100;
 
 import java.io.IOException;
 
@@ -17,14 +17,14 @@ import static support.FileUtils.getRegistrationDataFromFile;
 @Tag("unit")
 class ResidenceAndPresenceMapperV2Test {
 
-  private ResidenceAndPresence residenceAndPresence;
+  private ResidenceAndPresenceSchema100 residenceAndPresence;
   private ResidenceAndPresenceMapperV2 residenceAndPresenceMapperV2;
 
   @BeforeEach
   void beforeEach() throws IOException {
     residenceAndPresenceMapperV2 = new ResidenceAndPresenceMapperV2();
 
-    RegistrationSchema100 registrationSchema =
+    RegistrationSchema120 registrationSchema =
         getRegistrationDataFromFile("mapping/validRegistrationData.json");
 
     residenceAndPresence = registrationSchema.getResidenceAndPresence();
@@ -34,7 +34,7 @@ class ResidenceAndPresenceMapperV2Test {
   void when_british_in_uk_two_of_three_years_yes() {
     residenceAndPresence.setNationality("British");
     residenceAndPresence.setResidentBeforeBrexit(null);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -51,7 +51,7 @@ class ResidenceAndPresenceMapperV2Test {
   void when_british_in_uk_two_of_three_years_yes_not_receiving() {
     residenceAndPresence.setNationality("British");
     residenceAndPresence.setResidentBeforeBrexit(null);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.FALSE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -68,7 +68,7 @@ class ResidenceAndPresenceMapperV2Test {
   void when_british_in_uk_two_of_three_years_no() {
     residenceAndPresence.setNationality("British");
     residenceAndPresence.setResidentBeforeBrexit(null);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.NO);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.NO);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -86,7 +86,7 @@ class ResidenceAndPresenceMapperV2Test {
     residenceAndPresence.setNationality("British");
     residenceAndPresence.setResidentBeforeBrexit(null);
     residenceAndPresence.setInUkTwoOutOfThreeYears(
-        ResidenceAndPresence.InUkTwoOutOfThreeYears.DON_T_KNOW);
+        ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.DON_T_KNOW);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -102,8 +102,8 @@ class ResidenceAndPresenceMapperV2Test {
   @Test
   void when_austrian_before_brexit_yes() {
     residenceAndPresence.setNationality("Austrian");
-    residenceAndPresence.setResidentBeforeBrexit(ResidenceAndPresence.ResidentBeforeBrexit.YES);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+    residenceAndPresence.setResidentBeforeBrexit(ResidenceAndPresenceSchema100.ResidentBeforeBrexit.YES);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -119,8 +119,8 @@ class ResidenceAndPresenceMapperV2Test {
   @Test
   void when_austrian_before_brexit_no() {
     residenceAndPresence.setNationality("Austrian");
-    residenceAndPresence.setResidentBeforeBrexit(ResidenceAndPresence.ResidentBeforeBrexit.NO);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+    residenceAndPresence.setResidentBeforeBrexit(ResidenceAndPresenceSchema100.ResidentBeforeBrexit.NO);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -137,8 +137,8 @@ class ResidenceAndPresenceMapperV2Test {
   void when_austrian_before_brexit_dont_know() {
     residenceAndPresence.setNationality("Austrian");
     residenceAndPresence.setResidentBeforeBrexit(
-        ResidenceAndPresence.ResidentBeforeBrexit.DON_T_KNOW);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+        ResidenceAndPresenceSchema100.ResidentBeforeBrexit.DON_T_KNOW);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(Boolean.TRUE);
     residenceAndPresence.setPayingInsuranceEEA(Boolean.TRUE);
 
@@ -155,7 +155,7 @@ class ResidenceAndPresenceMapperV2Test {
   void when_non_eea() {
     residenceAndPresence.setNationality("Indian");
     residenceAndPresence.setResidentBeforeBrexit(null);
-    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresence.InUkTwoOutOfThreeYears.YES);
+    residenceAndPresence.setInUkTwoOutOfThreeYears(ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears.YES);
     residenceAndPresence.setReceivingPensionsOrBenefitsFromEEA(null);
     residenceAndPresence.setPayingInsuranceEEA(null);
 

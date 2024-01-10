@@ -8,7 +8,9 @@ import uk.gov.dwp.health.pip.application.manager.responsemodels.ApplicationStatu
 import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.*;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetApplicationStatusUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetRegistrationUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
 
 public class GetApplicationStatusIT extends ApiTest {
   String url;

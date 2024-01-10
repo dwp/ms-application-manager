@@ -2,9 +2,9 @@ package uk.gov.dwp.health.pip.application.manager.service.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealth;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetails;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetails100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.CareAccommodationDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.HealthProfessionalDto;
@@ -18,7 +18,7 @@ class AboutYourHealthMapperV2 {
 
   private final AddressMapperV2 addressMapperV2;
 
-  AboutYourHealthDto toDto(AboutYourHealth aboutYourHealth) {
+  AboutYourHealthDto toDto(AboutYourHealthSchema110 aboutYourHealth) {
     var hospitalHospiceOrCarehome = aboutYourHealth.getHospitalHospiceOrCarehome();
     var healthProfessionalsDetailsList = aboutYourHealth.getHealthProfessionalsDetails();
 
@@ -35,14 +35,14 @@ class AboutYourHealthMapperV2 {
   }
 
   private List<HealthProfessionalDto> getHealthProfessionals(
-      List<HealthProfessionalsDetails> healthProfessionalsDetailsList) {
+      List<HealthProfessionalsDetails100> healthProfessionalsDetailsList) {
     return healthProfessionalsDetailsList.stream()
         .map(this::toHealthProfessionalDto)
         .collect(Collectors.toList());
   }
 
   private HealthProfessionalDto toHealthProfessionalDto(
-      HealthProfessionalsDetails healthProfessionalsDetails) {
+      HealthProfessionalsDetails100 healthProfessionalsDetails) {
     return new HealthProfessionalDto()
         .name(healthProfessionalsDetails.getName())
         .profession(healthProfessionalsDetails.getProfession())
@@ -52,12 +52,12 @@ class AboutYourHealthMapperV2 {
   }
 
   private CareAccommodationDto.AccommodationTypeEnum getAccommodationType(
-      HospitalHospiceOrCarehome hospitalHospiceOrCarehome) {
+      HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
     var accommodationTypeValue = hospitalHospiceOrCarehome.getAccommodationType().value();
     return CareAccommodationDto.AccommodationTypeEnum.fromValue(accommodationTypeValue);
   }
 
-  private String getAdmissionDate(HospitalHospiceOrCarehome hospitalHospiceOrCarehome) {
+  private String getAdmissionDate(HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
     return (String) hospitalHospiceOrCarehome.getAdditionalProperties().get("admissionDate");
   }
 }

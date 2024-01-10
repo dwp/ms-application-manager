@@ -3,7 +3,7 @@ package uk.gov.dwp.health.pip.application.manager.service.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto.LanguageEnum;
 
@@ -20,7 +20,7 @@ public class RegistrationDataMapperV3 {
   private final ResidenceAndPresenceMapperV3 residenceAndPresenceMapperV3;
   private final StateDtoMapperV3 stateDtoMapperV3;
 
-  public RegistrationDto toDto(Application application, RegistrationSchema100 registrationSchema) {
+  public RegistrationDto toDto(Application application, RegistrationSchema120 registrationSchema) {
     return new RegistrationDto()
         .claimantId(application.getClaimantId())
         .effectiveFrom(application.getEffectiveFrom().toString())

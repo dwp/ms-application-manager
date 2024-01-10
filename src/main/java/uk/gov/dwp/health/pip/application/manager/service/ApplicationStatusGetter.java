@@ -62,9 +62,8 @@ public class ApplicationStatusGetter {
     if (ApplicationState.valueOf(currentApplicationState).getValue()
         > ApplicationState.REGISTRATION.getValue()) {
 
-      var registrationSchema =
-          registrationDataMarshaller.marshallRegistrationData(
-              application.getRegistrationData().getData());
+      var registrationSchema = registrationDataMarshaller.marshallRegistrationData(
+          application.getRegistrationData().getData());
       applicationStatusDto.surname(registrationSchema.getPersonalDetails().getSurname());
       applicationStatusDto.forename(registrationSchema.getPersonalDetails().getFirstname());
       applicationStatusDto.dateOfBirth(registrationSchema.getPersonalDetails().getDob());
