@@ -26,8 +26,10 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -96,9 +98,12 @@ class RegistrationResponseUpdaterTest {
     response.setMessage("VALIDATION FAILED ON NAME");
     var mockLogger = mock(Logger.class);
     RegistrationResponseUpdater.log = mockLogger;
+    ArgumentCaptor<Application> updatedApplication = ArgumentCaptor.forClass(Application.class);
     registrationDataUpdater.updateApplicationWithRegistrationResponse(response);
     verify(mockLogger).warn("Application [{}] submission failed with state [{}] details message {}",
         APP_ID , "Validation failed" , "VALIDATION FAILED ON NAME");
+    verify(repository, times(1)).save(updatedApplication.capture());
+    assertEquals(response.getMessage(), updatedApplication.getValue().getPipcsRegistrationState().getError());
   }
 
   private Application applicationFixture() {

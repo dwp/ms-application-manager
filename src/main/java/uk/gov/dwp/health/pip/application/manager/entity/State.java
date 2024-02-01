@@ -25,6 +25,9 @@ public class State {
   @Field(value = "history")
   private List<History> history;
 
+  @Field(value = "error")
+  private String error;
+
   public void addHistory(History history) {
     current = history.getState();
     if (this.history == null) {

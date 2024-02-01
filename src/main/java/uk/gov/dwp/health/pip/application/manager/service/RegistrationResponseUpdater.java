@@ -8,6 +8,7 @@ import uk.gov.dwp.health.pip.application.manager.constant.RegistrationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.entity.LegacyApplicationReference;
+import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.System;
 import uk.gov.dwp.health.pip.application.manager.event.model.response.PipGatewayRespondEventSchemaV1;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
@@ -44,10 +45,12 @@ public class RegistrationResponseUpdater {
 
   private void updateRegistrationState(
       Application application, PipGatewayRespondEventSchemaV1 response) {
-    application
-        .getPipcsRegistrationState()
-        .addHistory(
-            History.builder().state(response.getState()).timeStamp(clock.instant()).build());
+    final State pipcsRegistrationState = application.getPipcsRegistrationState();
+    final History history = History.builder()
+        .state(response.getState())
+        .timeStamp(clock.instant()).build();
+    pipcsRegistrationState.addHistory(history);
+    pipcsRegistrationState.setError(response.getMessage());
     if (RegistrationState.VALIDATION_FAILED.getLabel().equals(response.getState())) {
       log.warn("Application [{}] submission failed with state [{}] details message {}",
           response.getApplicationId(), response.getState(), response.getMessage());
