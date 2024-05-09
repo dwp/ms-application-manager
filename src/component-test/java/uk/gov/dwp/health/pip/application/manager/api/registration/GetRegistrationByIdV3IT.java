@@ -154,7 +154,7 @@ class GetRegistrationByIdV3IT extends ApiTest {
   }
 
   private void verifyResidenceAndPresence(ResidenceAndPresenceDto residenceAndPresenceDto) {
-    assertThat(residenceAndPresenceDto.getNationality()).isEqualTo("Dutch");
+    assertThat(residenceAndPresenceDto.getNationality()).isEqualTo("Filipino");
     assertThat(residenceAndPresenceDto.getResidentBeforeBrexit()).isEqualTo("Yes");
     assertThat(residenceAndPresenceDto.getInUkTwoOutOfThreeYears()).isEqualTo("Yes");
     assertThat(residenceAndPresenceDto.isReceivingPensionsOrBenefitsFromEEA()).isTrue();

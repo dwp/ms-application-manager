@@ -28,9 +28,9 @@ import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotVa
 import uk.gov.dwp.health.pip.application.manager.messaging.PipcsApiMessagePublisher;
 import uk.gov.dwp.health.pip.application.manager.messaging.properties.InboundEventProperties;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetails100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetailsSchema100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperForPipcs;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
@@ -257,8 +257,8 @@ class RegistrationSubmitterTest {
         .build();
   }
 
-  private RegistrationSchema120 getRegistrationSchemaFixture() {
-    var registrationSchema = new RegistrationSchema120();
+  private RegistrationSchema130 getRegistrationSchemaFixture() {
+    var registrationSchema = new RegistrationSchema130();
     var personalDetails = new PersonalDetailsSchema110();
     personalDetails.setFirstname("Azzzam");
     personalDetails.setSurname("Azzzle");
@@ -266,8 +266,8 @@ class RegistrationSubmitterTest {
     registrationSchema.setPersonalDetails(personalDetails);
 
     var aboutYourHealth = new AboutYourHealthSchema110();
-    var healthProfessionalsDetails1 = new HealthProfessionalsDetails100();
-    var healthProfessionalsDetails2 = new HealthProfessionalsDetails100();
+    var healthProfessionalsDetails1 = new HealthProfessionalsDetailsSchema100();
+    var healthProfessionalsDetails2 = new HealthProfessionalsDetailsSchema100();
     aboutYourHealth.setHealthProfessionalsDetails(
         List.of(healthProfessionalsDetails1, healthProfessionalsDetails2));
     registrationSchema.setAboutYourHealth(aboutYourHealth);

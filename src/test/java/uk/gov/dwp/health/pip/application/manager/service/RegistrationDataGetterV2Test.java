@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperV2;
@@ -38,7 +38,7 @@ class RegistrationDataGetterV2Test {
         Application.builder()
             .registrationData(FormData.builder().data("{registration form data}").build())
             .build();
-    var registrationSchema = new RegistrationSchema120();
+    var registrationSchema = new RegistrationSchema130();
     var expectedRegistrationDto = new RegistrationDto();
 
     when(applicationRepository.findById("application-id-1")).thenReturn(Optional.of(application));

@@ -16,7 +16,7 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.openapi.healthdisability.v1.dto.ErrorResponseObject;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
 
 @Component

@@ -1,5 +1,6 @@
 package uk.gov.dwp.health.pip.application.manager.repository;
 
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -14,7 +15,6 @@ import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.FormType;
 
-import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +41,8 @@ class CustomApplicationRepositoryTest {
   private static final String state = "REGISTRATION";
   private static final String wrongState = "NOT_REGISTRATION";
 
-  @Resource private MongoTemplate mongoTemplate;
+  @Resource
+  private MongoTemplate mongoTemplate;
   @Resource private ApplicationRepository applicationRepository;
 
   @BeforeEach

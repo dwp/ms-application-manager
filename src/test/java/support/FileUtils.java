@@ -3,7 +3,7 @@ package support;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class FileUtils {
 
-  public static RegistrationSchema120 getRegistrationDataFromFile(String registrationDataJsonFile)
+  public static RegistrationSchema130 getRegistrationDataFromFile(String registrationDataJsonFile)
       throws IOException {
     Map<String, Object> registrationDataJson = readTestFile(registrationDataJsonFile);
     return parseJson(registrationDataJson);
@@ -45,8 +45,8 @@ public class FileUtils {
     return json;
   }
 
-  private static RegistrationSchema120 parseJson(Map<String, Object> registrationDataJson) {
-    return parseJson(registrationDataJson, RegistrationSchema120.class);
+  private static RegistrationSchema130 parseJson(Map<String, Object> registrationDataJson) {
+    return parseJson(registrationDataJson, RegistrationSchema130.class);
   }
 
   private static <T> T parseJson(Map<String, Object> registrationDataJson, Class<T> clazz) {

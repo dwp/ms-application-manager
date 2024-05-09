@@ -16,7 +16,7 @@ import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 import java.util.Collections;
@@ -132,7 +132,7 @@ class ApplicationStatusGetterTest {
     assertThat(applicationStatusDto.getPostcode()).isEqualTo("postcode-1");
   }
 
-  private RegistrationSchema120 getRegistrationSchemaFixture() {
+  private RegistrationSchema130 getRegistrationSchemaFixture() {
     var addressSchema = new AddressSchema100();
     addressSchema.setPostcode("postcode-1");
 
@@ -143,7 +143,7 @@ class ApplicationStatusGetterTest {
     personalDetails.setNino("nino-1");
     personalDetails.setAddress(addressSchema);
 
-    var registrationSchema = new RegistrationSchema120();
+    var registrationSchema = new RegistrationSchema130();
     registrationSchema.setPersonalDetails(personalDetails);
 
     return registrationSchema;

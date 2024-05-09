@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperV2;
@@ -43,7 +43,7 @@ public class RegistrationDataGetterV2 {
             });
   }
 
-  private RegistrationSchema120 getDefinedRegistrationData(Application application) {
+  private RegistrationSchema130 getDefinedRegistrationData(Application application) {
     return registrationDataMarshaller.marshallRegistrationData(
         application.getRegistrationData().getData());
   }

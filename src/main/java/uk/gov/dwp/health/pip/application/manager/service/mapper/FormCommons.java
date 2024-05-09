@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ class FormCommons {
   }
 
   Object getCareAccommodationAddressFromForm(
-      HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
+      HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome) {
     return hospitalHospiceOrCarehome.getAdditionalProperties().get("address");
   }
 

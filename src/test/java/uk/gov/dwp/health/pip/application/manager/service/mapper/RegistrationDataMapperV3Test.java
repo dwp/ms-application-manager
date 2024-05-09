@@ -13,8 +13,8 @@ import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupportSchema100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AdditionalSupportDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.PersonalDetailsDto;
@@ -52,7 +52,7 @@ class RegistrationDataMapperV3Test {
         .language(Language.CY)
         .build();
 
-    RegistrationSchema120 registrationSchema100 = getRegistrationData();
+    RegistrationSchema130 registrationSchema100 = getRegistrationData();
 
     var personalDetailsDto = new PersonalDetailsDto();
     var aboutYourHealthDto = new AboutYourHealthDto();
@@ -86,11 +86,11 @@ class RegistrationDataMapperV3Test {
     assertThat(registrationDto.getStateDto()).isEqualTo(stateDto);
   }
 
-  private RegistrationSchema120 getRegistrationData() {
-    var registrationSchema = new RegistrationSchema120();
+  private RegistrationSchema130 getRegistrationData() {
+    var registrationSchema = new RegistrationSchema130();
     var personalDetails = new PersonalDetailsSchema110();
     var aboutYourHealth = new AboutYourHealthSchema110();
-    var residenceAndPresence = new ResidenceAndPresenceSchema100();
+    var residenceAndPresence = new ResidenceAndPresenceSchema110();
     var additionalSupport = new AdditionalSupportSchema100();
     registrationSchema.setPersonalDetails(personalDetails);
     registrationSchema.setAboutYourHealth(aboutYourHealth);

@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.io.IOException;
 import java.util.Set;
 
@@ -20,8 +20,8 @@ public class RegistrationDataMarshaller {
 
   private final ObjectMapper objectMapper;
 
-  RegistrationSchema120 marshallRegistrationData(Object registrationData) {
-    RegistrationSchema120 registrationSchema = getRegistrationSchema120(registrationData);
+  RegistrationSchema130 marshallRegistrationData(Object registrationData) {
+    RegistrationSchema130 registrationSchema = getRegistrationSchema130(registrationData);
 
     if (registrationSchema != null) {
       validate(registrationSchema);
@@ -30,8 +30,8 @@ public class RegistrationDataMarshaller {
     return registrationSchema;
   }
 
-  private RegistrationSchema120 getRegistrationSchema120(Object registrationData) {
-    return getRegistrationSchema(registrationData, RegistrationSchema120.class);
+  private RegistrationSchema130 getRegistrationSchema130(Object registrationData) {
+    return getRegistrationSchema(registrationData, RegistrationSchema130.class);
   }
 
   private <T> T getRegistrationSchema(Object registrationData, Class<T> registrationSchemaVersion) {

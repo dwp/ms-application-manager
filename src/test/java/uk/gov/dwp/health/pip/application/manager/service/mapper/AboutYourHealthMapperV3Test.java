@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.HealthProfessionalDto;
 
@@ -21,7 +21,7 @@ import static support.FileUtils.getRegistrationDataFromFile;
 class AboutYourHealthMapperV3Test {
 
   private AboutYourHealthMapperV3 aboutYourHealthMapperV3;
-  private RegistrationSchema120 registrationSchema;
+  private RegistrationSchema130 registrationSchema;
 
   @BeforeEach
   void beforeEach() {

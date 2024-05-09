@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.carehome.HospitalAndOtherAccomDetails;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.common.Address;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.AccommodationType;
@@ -23,13 +23,13 @@ class HospitalAndOtherAccomDetailsMapper {
   private final PostcodeMapper postcodeMapper;
 
   HospitalAndOtherAccomDetails getHospitalAndOtherAccomDetails(
-      HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
+      HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome) {
 
     if (hospitalHospiceOrCarehome != null) {
-      HospitalHospiceOrCarehome100.AccommodationType accommodationType =
+      HospitalHospiceOrCarehomeSchema100.AccommodationType accommodationType =
           hospitalHospiceOrCarehome.getAccommodationType();
       checkAccommodationTypeExists(accommodationType);
-      if (HospitalHospiceOrCarehome100.AccommodationType.NONE == accommodationType) {
+      if (HospitalHospiceOrCarehomeSchema100.AccommodationType.NONE == accommodationType) {
         return null;
       }
 
@@ -51,7 +51,7 @@ class HospitalAndOtherAccomDetailsMapper {
   }
 
   private void checkAccommodationTypeExists(
-      HospitalHospiceOrCarehome100.AccommodationType accommodationType) {
+      HospitalHospiceOrCarehomeSchema100.AccommodationType accommodationType) {
     if (accommodationType == null) {
       log.debug(
           "Registration data not valid. "
@@ -62,7 +62,9 @@ class HospitalAndOtherAccomDetailsMapper {
   }
 
   private Address getAddress(
-      AddressSchema100 addressSchema, HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
+      AddressSchema100 addressSchema,
+      HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome
+  ) {
     if (addressSchema == null) {
       return null;
     }
@@ -84,7 +86,9 @@ class HospitalAndOtherAccomDetailsMapper {
         .build();
   }
 
-  private LocalDate getAdmissionDate(HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome) {
+  private LocalDate getAdmissionDate(
+      HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome
+  ) {
     String admissionDate =
         (String) hospitalHospiceOrCarehome.getAdditionalProperties().get("admissionDate");
 

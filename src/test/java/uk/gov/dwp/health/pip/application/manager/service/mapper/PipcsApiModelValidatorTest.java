@@ -6,13 +6,11 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.pipcsapimodeller.validation.Validatable;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -20,11 +18,20 @@ import static org.mockito.Mockito.when;
 class PipcsApiModelValidatorTest {
 
   @InjectMocks private PipcsApiModelValidator pipcsApiModelValidator;
-  @Mock private Validatable validatable;
+  private Validatable validatable = new Validatable() {
+    @Override
+    public String errorsToString() {
+      return "errors-to-string";
+    }
+
+    @Override
+    public boolean validate() {
+      return false;
+    }
+  };
 
   @Test
   void when_not_valid() {
-    when(validatable.errorsToString()).thenReturn("errors-to-string");
     assertThatThrownBy(() -> pipcsApiModelValidator.validate(validatable))
         .isInstanceOf(RegistrationDataNotValid.class)
         .hasMessage(

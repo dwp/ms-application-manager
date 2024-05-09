@@ -6,9 +6,9 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.InUkTwoOutOfThreeYears;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema100.ResidentBeforeBrexit;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110.InUkTwoOutOfThreeYears;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110.ResidentBeforeBrexit;
 
 import java.io.IOException;
 
@@ -20,7 +20,7 @@ import static support.FileUtils.getRegistrationDataFromFile;
 @Tag("unit")
 class ResidencyDetailsMapperTest {
 
-  private RegistrationSchema120 registrationSchema;
+  private RegistrationSchema130 registrationSchema;
   private ResidencyDetailsMapper residencyDetailsMapper;
 
   @BeforeEach
@@ -28,6 +28,25 @@ class ResidencyDetailsMapperTest {
     residencyDetailsMapper = new ResidencyDetailsMapper();
 
     registrationSchema = getRegistrationDataFromFile("mapping/validRegistrationData.json");
+  }
+
+  @Test
+  void when_new_nationality() {
+    nationalitiesCanAllBeMappedToPipcsSchema("Filipino");
+    nationalitiesCanAllBeMappedToPipcsSchema("Singaporean");
+    nationalitiesCanAllBeMappedToPipcsSchema("Palestinian Territories");
+    nationalitiesCanAllBeMappedToPipcsSchema("Kosovan");
+    nationalitiesCanAllBeMappedToPipcsSchema("North Korean");
+    nationalitiesCanAllBeMappedToPipcsSchema("Serbian");
+  }
+
+  private void nationalitiesCanAllBeMappedToPipcsSchema(final String nationality) {
+    var residenceAndPresence = registrationSchema.getResidenceAndPresence();
+    residenceAndPresence.setNationality(nationality);
+
+    var residencyDetails = residencyDetailsMapper.mapResidencyDetails(registrationSchema);
+
+    assertThat(residencyDetails.getNationality()).isEqualTo(nationality);
   }
 
   @Test

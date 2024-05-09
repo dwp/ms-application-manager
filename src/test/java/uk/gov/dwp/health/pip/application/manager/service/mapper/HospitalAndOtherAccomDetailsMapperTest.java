@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehome100.AccommodationType;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100.AccommodationType;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.carehome.HospitalAndOtherAccomDetails;
 
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Tag("unit")
 class HospitalAndOtherAccomDetailsMapperTest {
   private HospitalAndOtherAccomDetailsMapper hospitalAndOtherAccomDetailsMapper;
-  private HospitalHospiceOrCarehome100 hospitalHospiceOrCarehome;
+  private HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome;
 
   @BeforeEach
   void beforeEach() {
@@ -30,7 +30,7 @@ class HospitalAndOtherAccomDetailsMapperTest {
         new HospitalAndOtherAccomDetailsMapper(
             new FormCommons(new ObjectMapper()), new PostcodeMapper());
 
-    hospitalHospiceOrCarehome = new HospitalHospiceOrCarehome100();
+    hospitalHospiceOrCarehome = new HospitalHospiceOrCarehomeSchema100();
   }
 
   @Nested

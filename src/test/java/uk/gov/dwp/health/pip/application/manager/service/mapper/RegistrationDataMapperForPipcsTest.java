@@ -16,7 +16,7 @@ import support.FileUtils;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110.FormatType;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HelperDetails100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.YesNoDontKnow;
 
@@ -37,7 +37,7 @@ class RegistrationDataMapperForPipcsTest {
   private static final LocalDate DATE_REGISTRATION_SUBMITTED = LocalDate.now();
 
   private RegistrationDataMapperForPipcs registrationDataMapper;
-  private RegistrationSchema120 registrationSchema;
+  private RegistrationSchema130 registrationSchema;
 
   @Mock private HospitalAndOtherAccomDetailsMapper hospitalAndOtherAccomDetailsMapper;
   @Mock private ResidencyDetailsMapper residencyDetailsMapper;
@@ -444,8 +444,8 @@ class RegistrationDataMapperForPipcsTest {
     alternateFormat.setAdditionalProperty(key, value);
   }
 
-  private RegistrationSchema120 parseJson(Map<String, Object> registrationDataJson) {
+  private RegistrationSchema130 parseJson(Map<String, Object> registrationDataJson) {
     ObjectMapper objectMapper = new ObjectMapper();
-    return objectMapper.convertValue(registrationDataJson, RegistrationSchema120.class);
+    return objectMapper.convertValue(registrationDataJson, RegistrationSchema130.class);
   }
 }

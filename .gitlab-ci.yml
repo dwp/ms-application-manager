@@ -4,7 +4,7 @@ variables:
   # Config
   BUILD_TYPE: MAVEN
   MAVEN_IMAGE: "maven:3-openjdk-17"
-  MVN_OPTS: "-DLOG_LEVEL=INFO"
+  MVN_OPTS: "-DLOG_LEVEL=INFO -Dde.flapdoodle.os.override=Linux|X86_64|Oracle|Oracle_8"
   MVN_CLI_OPTS: "--batch-mode"
   REPO_OWNER: "Team Goldcrest"
   REPO_PATTERN: "V3 CI"
@@ -13,6 +13,10 @@ variables:
   SERVICE_NAME: "PIP Apply Application Manager"
   GITHUB_REPO_NAME: ms-application-manager
   CI_PROJECT_NAME: ms-application-manager
+  PITEST_TARGET_CLASSES: "uk.gov.dwp.health.pip.application.manager.*"
+  PITEST_TARGET_TEST_CLASSES: "uk.gov.dwp.health.pip.application.manager.*"
+  PITEST_EXCLUDED_TEST_CLASSES: "*.AppControllerAdviseTest,uk.gov.dwp.health.pip.application.manager.repository.*"
+  PITEST_EXCLUDED_CLASSES: "uk.gov.dwp.health.pip.application.manager.openapi.*"
 
 stages:
   - update-version
@@ -42,10 +46,20 @@ required-fragment-check:
     RULESET: MAVEN_CI
 
 docker-build:
+  tags:
+    - "docker-in-docker"
   extends: .docker-build-template
   before_script:
     - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
     - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+container-test-command:
+  tags:
+    - "docker-in-docker"
+
+sast-container:
+  tags:
+    - "docker-in-docker"
 
 create-develop-nightly-schedule:
   extends: .add-schedule
@@ -66,8 +80,16 @@ create-develop-nightly-schedule:
     - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
     - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
+### IMAGE PUSH
+push-to-ecr-nonprodaws:
+  extends: .push-to-ecr
+  tags:
+    - docker-in-docker
+
 api-test:
   allow_failure: false
+  tags:
+    - "docker-in-docker"
   extends: .docker-compose-run
   stage: component-test
   variables:
@@ -90,9 +112,21 @@ api-test:
       - ~/.m2/repository/
 
 trivy-container:
+  tags:
+    - "docker-in-docker"
   extends: .trivy-container-base
   variables:
     HIGH_SUPPRESSIONS: ""
+
+gitleaks:
+  extends: .gitleaks-template-saas
+  variables:
+    GITLEAKS_INCLUDE_FILE: "ci-include-gitleaks-base.yml"
+  only:
+    - /^[Ff]-.*$/
+    - /^[Rr]-.*$/
+    - /^renovate\/.*$/
+    - /.*RENOVATE_BOT.*/
 
 ### DEFAULT RUNNER ###
 default:
