@@ -16,7 +16,7 @@ import support.FileUtils;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AlternateFormat110.FormatType;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.HelperDetails100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.YesNoDontKnow;
 
@@ -37,10 +37,10 @@ class RegistrationDataMapperForPipcsTest {
   private static final LocalDate DATE_REGISTRATION_SUBMITTED = LocalDate.now();
 
   private RegistrationDataMapperForPipcs registrationDataMapper;
-  private RegistrationSchema130 registrationSchema;
+  private RegistrationSchema140 registrationSchema;
 
   @Mock private HospitalAndOtherAccomDetailsMapper hospitalAndOtherAccomDetailsMapper;
-  @Mock private ResidencyDetailsMapper residencyDetailsMapper;
+  @Mock private ResidencyDetailsMapperV2 residencyDetailsMapper;
 
   @Mock private PipcsApiModelValidator pipcsApiModelValidator;
 
@@ -62,6 +62,7 @@ class RegistrationDataMapperForPipcsTest {
       Map<String, Object> registrationDataJson =
           FileUtils.readTestFile("mapping/validRegistrationData.json");
       registrationSchema = parseJson(registrationDataJson);
+      registrationSchema.setChannelType(RegistrationSchema140.ChannelType.DIGITAL);
     }
 
     @Test
@@ -198,6 +199,7 @@ class RegistrationDataMapperForPipcsTest {
       Map<String, Object> registrationDataJson =
           FileUtils.readTestFile("mapping/alternateFormatBrailleType1.json");
       registrationSchema = parseJson(registrationDataJson);
+      registrationSchema.setChannelType(RegistrationSchema140.ChannelType.DIGITAL);
     }
 
     @Test
@@ -274,6 +276,7 @@ class RegistrationDataMapperForPipcsTest {
       Map<String, Object> registrationDataJson =
           FileUtils.readTestFile("mapping/alternateFormatOther.json");
       registrationSchema = parseJson(registrationDataJson);
+      registrationSchema.setChannelType(RegistrationSchema140.ChannelType.DIGITAL);
     }
 
     @Test
@@ -444,8 +447,8 @@ class RegistrationDataMapperForPipcsTest {
     alternateFormat.setAdditionalProperty(key, value);
   }
 
-  private RegistrationSchema130 parseJson(Map<String, Object> registrationDataJson) {
+  private RegistrationSchema140 parseJson(Map<String, Object> registrationDataJson) {
     ObjectMapper objectMapper = new ObjectMapper();
-    return objectMapper.convertValue(registrationDataJson, RegistrationSchema130.class);
+    return objectMapper.convertValue(registrationDataJson, RegistrationSchema140.class);
   }
 }

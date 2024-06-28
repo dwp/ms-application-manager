@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
@@ -37,7 +37,6 @@ class RegistrationApiAdapterTest {
   @Mock private RegistrationDataUpdater registrationDataUpdater;
   @Mock private RegistrationSubmitter registrationSubmitter;
   @Mock private ApplicationStatusGetter applicationStatusGetter;
-
   @InjectMocks private RegistrationApiAdapter registrationApiAdapter;
 
   @Test
@@ -133,8 +132,8 @@ class RegistrationApiAdapterTest {
   @Test
   void should_return_application_status_and_claimant_id_when_getter_invoked() {
     var applicationId = UUID.randomUUID().toString();
-    var claimantIdAndStatusDto = new ClaimantIdAndStatusDto();
-    claimantIdAndStatusDto.setApplicationStatus(ClaimantIdAndStatusDto.ApplicationStatusEnum.REGISTRATION);
+    var claimantIdAndStatusDto = new ClaimantIdAndApplicationStatus();
+    claimantIdAndStatusDto.setApplicationStatus(ClaimantIdAndApplicationStatus.ApplicationStatusEnum.REGISTRATION);
     when(applicationStatusGetter.getClaimantIdAndStatus(anyString()))
             .thenReturn(claimantIdAndStatusDto);
     var actual = registrationApiAdapter.getClaimantIdAndStatus(applicationId);

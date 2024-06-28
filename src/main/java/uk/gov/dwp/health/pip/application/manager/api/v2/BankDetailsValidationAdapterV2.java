@@ -20,7 +20,7 @@ public class BankDetailsValidationAdapterV2 implements V2Api {
   private final BankDetailsValidatorV2 bankDetailsValidator;
 
   @Override
-  public ResponseEntity<List<String>> validate(final String consumerId, final String correlationId,
+  public ResponseEntity<List<String>> validate(final String correlationId, final String consumerId,
       final AccountDetails account) {
     final BankDetailsValidityList bankDetailsValidity = bankDetailsValidator.validate(
         account.getAccountNumber(),

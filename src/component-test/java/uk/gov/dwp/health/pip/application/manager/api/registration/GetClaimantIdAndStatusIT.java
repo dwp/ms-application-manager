@@ -3,7 +3,7 @@ package uk.gov.dwp.health.pip.application.manager.api.registration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.api.ApiTest;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
 import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Registration;
 import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
@@ -27,13 +27,13 @@ public class GetClaimantIdAndStatusIT extends ApiTest {
     @Test
     public void shouldReturn200StatusCodeForValidApplicationID() {
         int actualStatusCode = getRequest(url).statusCode();
-        ClaimantIdAndStatusDto claimantIdAndStatusDto =
-                extractGetRequest(url, ClaimantIdAndStatusDto.class);
+        ClaimantIdAndApplicationStatus claimantIdAndStatusDto =
+                extractGetRequest(url, ClaimantIdAndApplicationStatus.class);
 
         assertThat(actualStatusCode).isEqualTo(200);
         assertThat(claimantIdAndStatusDto.getClaimantId()).matches("^[a-zA-Z0-9]{24}$");
         assertThat(claimantIdAndStatusDto.getApplicationStatus())
-                .isEqualTo(ClaimantIdAndStatusDto.ApplicationStatusEnum.REGISTRATION);
+                .isEqualTo(ClaimantIdAndApplicationStatus.ApplicationStatusEnum.REGISTRATION);
     }
 
     @Test

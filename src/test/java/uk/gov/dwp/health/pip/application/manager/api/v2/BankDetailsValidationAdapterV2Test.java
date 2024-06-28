@@ -30,8 +30,8 @@ class BankDetailsValidationAdapterV2Test {
     public static final String SORT_CODE = "2";
     public static final String ROLL_NUMBER = "3";
     public static final String INVALID_ACCOUNT_NUMBER = "5";
-    public static final String CONSUMER_ID = "6";
-    public static final String CORRELATION_ID = "7";
+    public static final String CORRELATION_ID = "6";
+    public static final String CONSUMER_ID = "7";
 
     @InjectMocks private BankDetailsValidationAdapterV2 bankDetailsValidationAdapterV2;
     @Mock private BankDetailsValidatorV2 bankDetailsValidator;
@@ -46,7 +46,7 @@ class BankDetailsValidationAdapterV2Test {
         account.setAccountNumber(ACCOUNT_NUMBER);
         account.setSortCode(SORT_CODE);
         account.setRollNumber(ROLL_NUMBER);
-        ResponseEntity<List<String>> responseEntity = bankDetailsValidationAdapterV2.validate(CONSUMER_ID, CORRELATION_ID, account);
+        ResponseEntity<List<String>> responseEntity = bankDetailsValidationAdapterV2.validate(CORRELATION_ID, CONSUMER_ID, account);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNotNull();
@@ -68,7 +68,7 @@ class BankDetailsValidationAdapterV2Test {
         invalidAccount.setSortCode(SORT_CODE);
         invalidAccount.setRollNumber(ROLL_NUMBER);
         ResponseEntity<List<String>> invalidResponseEntity =
-                bankDetailsValidationAdapterV2.validate( CONSUMER_ID, CORRELATION_ID, invalidAccount);
+                bankDetailsValidationAdapterV2.validate( CORRELATION_ID, CONSUMER_ID, invalidAccount);
 
         assertThat(invalidResponseEntity.getBody().size()).isEqualTo(2);
         assertThat(invalidResponseEntity.getBody().get(0)).isEqualTo("INVALID_ACCOUNT_COMBINATION");

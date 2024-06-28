@@ -1,5 +1,8 @@
 package uk.gov.dwp.health.pip.application.manager.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.format.DateTimeParseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -10,6 +13,7 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientException;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.exception.MessagingEventException;
 import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
@@ -18,10 +22,6 @@ import uk.org.lidalia.slf4jext.Level;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
-
-import java.time.format.DateTimeParseException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @Tag("unit")

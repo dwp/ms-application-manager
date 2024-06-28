@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class StateDtoMapperV3 {
-  StateDto toDto(State state) {
+  public StateDto toDto(State state) {
     return new StateDto()
         .currentState(CurrentStateEnum.valueOf(state.getCurrent()))
         .history(getHistory(state.getHistory()));

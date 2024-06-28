@@ -1,18 +1,15 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -20,19 +17,26 @@ import java.util.stream.Collectors;
 public class RegistrationDataGetter {
 
   private final ApplicationRepository repository;
+  private final ApplicationCoordinatorService applicationCoordinatorService;
 
   public RegistrationDto getRegistrationDataByClaimantId(String claimantId) {
     List<Application> applications = repository.findAllByClaimantId(claimantId);
-    var registrationDtos =
+
+    List<String> ids = applications.stream().map(Application::getId).toList();
+
+    List<String> resgistrationIds =
+        applicationCoordinatorService.getRegistrationApplicationIds(ids);
+
+    List<RegistrationDto> registrationDtos =
         applications.stream()
             .filter(
                 application -> {
-                  var current = application.getState().getCurrent();
-                  return ApplicationState.valueOf(current).getValue()
-                      < ApplicationState.HEALTH_AND_DISABILITY.getValue();
+                  String id = application.getId();
+                  return resgistrationIds.contains(id);
                 })
             .map(this::mapToDto)
-            .collect(Collectors.toList());
+            .toList();
+
     if (registrationDtos.isEmpty()) {
       throw new ApplicationNotFoundException("No registration data found for provided Claimant ID");
     }

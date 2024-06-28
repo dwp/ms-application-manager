@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import uk.gov.dwp.health.pip.application.manager.entity.BankDetailsValidityList;
 import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.V1Api;
 import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.dto.AccountDetails;
+import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.dto.BankDetailsDto;
+import uk.gov.dwp.health.pip.application.manager.service.BankDetailsGetter;
 import uk.gov.dwp.health.pip.application.manager.service.BankDetailsValidator;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BankDetailsValidationAdapterV1 implements V1Api {
 
   private final BankDetailsValidator bankDetailsValidator;
+  private final BankDetailsGetter bankDetailsGetter;
 
   @Override
   public ResponseEntity<List<String>> validate(final AccountDetails account) {
@@ -29,5 +32,12 @@ public class BankDetailsValidationAdapterV1 implements V1Api {
     final List<String> resultsAsStrings = bankDetailsValidity.getResultsAsStrings();
     log.info("validated bank details {}", resultsAsStrings);
     return new ResponseEntity<>(resultsAsStrings, HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<BankDetailsDto> getBankDetailsByApplicationId(String applicationId) {
+    final BankDetailsDto bankDetailsDto = bankDetailsGetter
+            .getBankDetailsByApplicationId(applicationId);
+    return new ResponseEntity<>(bankDetailsDto, HttpStatus.OK);
   }
 }

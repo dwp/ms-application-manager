@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema120;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupportSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AdditionalSupportDto;
@@ -40,7 +40,7 @@ class RegistrationDataMapperV2Test {
   void when_mapping_form_to_api() {
     var application = Application.builder().dateRegistrationSubmitted(LocalDate.now()).build();
 
-    RegistrationSchema130 registrationSchema = getRegistrationData();
+    RegistrationSchema140 registrationSchema = getRegistrationData();
 
     var personalDetailsDto = new PersonalDetailsDto();
     var aboutYourHealthDto = new AboutYourHealthDto();
@@ -65,10 +65,10 @@ class RegistrationDataMapperV2Test {
     assertThat(registrationDto.getAdditionalSupport()).isEqualTo(additionalSupportDto);
   }
 
-  private RegistrationSchema130 getRegistrationData() {
-    var registrationSchema = new RegistrationSchema130();
-    var personalDetails = new PersonalDetailsSchema110();
-    var aboutYourHealth = new AboutYourHealthSchema110();
+  private RegistrationSchema140 getRegistrationData() {
+    var registrationSchema = new RegistrationSchema140();
+    var personalDetails = new PersonalDetailsSchema120();
+    var aboutYourHealth = new AboutYourHealthSchema120();
     var residenceAndPresence = new ResidenceAndPresenceSchema110();
     var additionalSupport = new AdditionalSupportSchema100();
     registrationSchema.setPersonalDetails(personalDetails);

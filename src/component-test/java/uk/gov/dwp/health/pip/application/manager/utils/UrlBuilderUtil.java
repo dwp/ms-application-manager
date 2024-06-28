@@ -51,6 +51,10 @@ public class UrlBuilderUtil {
     return baseURI + "/v1/application/" + applicationId + "/healthdisability";
   }
 
+  public static String buildGetBankDetailsUrl(String applicationId) {
+    return baseURI + "/v1/application/" + applicationId + "/bank-details";
+  }
+
   public static String buildPostBankDetailsUrl() {
     return baseURI + "/v1/validate";
   }

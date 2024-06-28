@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 
 import java.io.IOException;
 import java.util.Map;
@@ -27,7 +27,7 @@ class RegistrationDataMarshallerTest {
   @Test
   void when_valid() throws IOException {
     Map<String, Object> map = readTestFile("mapping/validRegistrationData.json");
-    final RegistrationSchema130 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
+    final RegistrationSchema140 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map);
     assertThat(registrationSchema.getPersonalDetails().getSurname()).isEqualTo("Azzzle");
     assertThat(registrationSchema.getPersonalDetails().getBankDetails().getEnterBankDetails()).isNotNull();
     assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountName")).isEqualTo("Bank of Yorkshire");
@@ -39,14 +39,14 @@ class RegistrationDataMarshallerTest {
   @Test
   void when_bank_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/bankDetailsMissing.json");
-    final RegistrationSchema130 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
+    final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
     assertThat(registrationData).isNotNull();
   }
 
   @Test
   void when_motability_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/motabilityDetailsMissing.json");
-    final RegistrationSchema130 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
+    final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
     assertThat(registrationData).isNotNull();
   }
 

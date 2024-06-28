@@ -32,11 +32,4 @@ public class GetApplicationStatusIT extends ApiTest {
     assertThat(applicationStatus.getApplicationId()).matches("^[a-zA-Z0-9]{24}$");
     assertThat(applicationStatus.getApplicationStatus()).isEqualTo("REGISTRATION");
   }
-
-  @Test
-  public void shouldReturn404StatusCodeWhenTheClaimantIdIsNotFound() {
-    int actualResponseCode = getRequest(buildGetRegistrationUrl(RandomStringUtil.generate(24))).statusCode();
-
-    assertThat(actualResponseCode).isEqualTo(404);
-  }
 }

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110.InUkTwoOutOfThreeYears;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110.ResidentBeforeBrexit;
 
@@ -20,7 +20,7 @@ import static support.FileUtils.getRegistrationDataFromFile;
 @Tag("unit")
 class ResidencyDetailsMapperTest {
 
-  private RegistrationSchema130 registrationSchema;
+  private RegistrationSchema140 registrationSchema;
   private ResidencyDetailsMapper residencyDetailsMapper;
 
   @BeforeEach

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.AlternateFormatDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.PersonalDetailsDto;
 
@@ -28,7 +28,7 @@ class PersonalDetailsMapperV2Test {
   @Mock private AlternateFormatMapperV2 alternateFormatMapperV2;
 
   private PersonalDetailsMapperV2 personalDetailsMapperV2;
-  private RegistrationSchema130 registrationSchema;
+  private RegistrationSchema140 registrationSchema;
 
   @BeforeEach
   void beforeEach() {

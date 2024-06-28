@@ -1,5 +1,15 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -17,18 +27,8 @@ import uk.gov.dwp.health.pip.application.manager.entity.Audit;
 import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
+import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +37,7 @@ class HealthDataSubmitterV2Test {
 
   @InjectMocks private HealthDataSubmitterV2 healthDataSubmitterV2;
   @Mock private ApplicationRepository applicationRepository;
+  @Mock private ApplicationCoordinatorService applicationCoordinatorService;
   @Mock private Clock clock;
 
   @Nested
@@ -55,7 +56,8 @@ class HealthDataSubmitterV2Test {
     void when_application_exists_submit() {
       when(applicationRepository.findById("application-id-1"))
           .thenReturn(Optional.ofNullable(existingApplication));
-      when(clock.instant()).thenReturn(now);
+      when(clock.instant())
+              .thenReturn(now);
 
       healthDataSubmitterV2.submitHealthData("application-id-1", "submission-id-1");
 

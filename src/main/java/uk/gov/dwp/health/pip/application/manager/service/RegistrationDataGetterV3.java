@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
+import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperV3;
+import uk.gov.dwp.health.pip.application.manager.service.mapper.StateDtoMapperV3;
 
 @RequiredArgsConstructor
 @Service
@@ -18,32 +20,39 @@ public class RegistrationDataGetterV3 {
   private final ApplicationRepository repository;
   private final RegistrationDataMapperV3 registrationDataMapperV3;
   private final RegistrationDataMarshaller registrationDataMarshaller;
+  private final ApplicationCoordinatorService applicationCoordinatorService;
+  private final StateDtoMapperV3 stateDtoMapperV3;
 
   public RegistrationDto getRegistrationDataByApplicationId(String applicationId) {
     log.info("About to get registration data for application {}", applicationId);
 
-    var application = getApplication(applicationId);
+    Application application = getApplication(applicationId);
 
-    var registrationSchema = getDefinedRegistrationData(application);
+    RegistrationSchema140 registrationSchema = getDefinedRegistrationData(application);
 
-    var registrationDto = registrationDataMapperV3.toDto(application, registrationSchema);
+    RegistrationDto registrationDto =
+        registrationDataMapperV3.toDto(application, registrationSchema);
 
-    log.info("Got registration data for application {}", applicationId);
-
-    return registrationDto;
+    try {
+      State getRegistrationState = applicationCoordinatorService.getApplicationState(applicationId);
+      registrationDto.setStateDto(stateDtoMapperV3.toDto(getRegistrationState));
+      log.info("Got registration data for application {}", applicationId);
+      return registrationDto;
+    } catch (ApplicationNotFoundException exc) {
+      return registrationDto;
+    }
   }
 
   private Application getApplication(String applicationId) {
     return repository
         .findById(applicationId)
         .orElseThrow(
-            () -> {
-              throw new ApplicationNotFoundException(
-                  "No registration data found for application id: " + applicationId);
-            });
+            () ->
+                new ApplicationNotFoundException(
+                    "No registration data found for application id: " + applicationId));
   }
 
-  private RegistrationSchema130 getDefinedRegistrationData(Application application) {
+  private RegistrationSchema140 getDefinedRegistrationData(Application application) {
     return registrationDataMarshaller.marshallRegistrationData(
         application.getRegistrationData().getData());
   }

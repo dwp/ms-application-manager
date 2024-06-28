@@ -1,19 +1,13 @@
 $schema: https://gitlab.com/dwp/secure-development/schema/project-metadata/-/raw/v1.0.0/schema/project-metadata.json
-
 schema_version: 1.0.0
-
 project:
   - project_id: 28972556
     component_name: ms-application-manager
-
-    version: 2.11.0
-
+    version: 2.14.0
     last_verified:
-      date: "2024-04-15"
+      date: "2024-06-27"
       name: "@nick.preece"
-
     tags:
       payments: false
       personally_identifying_information: true
-
     cmdb_id: 1d3e07e81b7d14500b3732a0dc4bcbf4

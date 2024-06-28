@@ -2,6 +2,11 @@ package uk.gov.dwp.health.pip.application.manager.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,17 +23,12 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.messaging.PipcsApiMessagePublisher;
 import uk.gov.dwp.health.pip.application.manager.messaging.properties.InboundEventProperties;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.StateDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperForPipcs;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -42,6 +42,7 @@ public class RegistrationSubmitter {
   private final InboundEventProperties inboundEventProperties;
   private final RegistrationDataMapperForPipcs registrationDataMapper;
   private final RegistrationDataMarshaller registrationDataMarshaller;
+  private final ApplicationCoordinatorService applicationCoordinatorService;
 
   @Value("${pip.registration.resubmit.timeout.second:3600}")
   protected int resubmitTimeoutSecond;
@@ -49,7 +50,7 @@ public class RegistrationSubmitter {
   public void submitRegistrationData(String applicationId) {
     Application application = getApplication(applicationId);
     isAllowedSubmitRegistration(application);
-    RegistrationSchema130 registrationSchema = marshallRegistrationData(application);
+    RegistrationSchema140 registrationSchema = marshallRegistrationData(application);
     setClaimantDetails(registrationSchema, application);
     setDateRegistrationSubmitted(application);
     Pip1RegistrationForm pip1RegistrationForm =
@@ -71,18 +72,15 @@ public class RegistrationSubmitter {
                     "No application found against provided Application ID"));
   }
 
-  private void setClaimantDetails(
-      RegistrationSchema130 registrationData, Application application
-  ) {
+  private void setClaimantDetails(RegistrationSchema140 registrationData, Application application) {
     application.setForename(registrationData.getPersonalDetails().getFirstname());
     application.setSurname(registrationData.getPersonalDetails().getSurname());
     application.setNino(registrationData.getPersonalDetails().getNino());
   }
 
-  private RegistrationSchema130 marshallRegistrationData(Application application) {
+  private RegistrationSchema140 marshallRegistrationData(Application application) {
     return registrationDataMarshaller.marshallRegistrationData(
-        application.getRegistrationData().getData()
-    );
+        application.getRegistrationData().getData());
   }
 
   private void setDateRegistrationSubmitted(Application application) {
@@ -90,7 +88,7 @@ public class RegistrationSubmitter {
   }
 
   private Pip1RegistrationForm mapRegistrationData(
-      Application application, RegistrationSchema130 registrationSchema) {
+      Application application, RegistrationSchema140 registrationSchema) {
     return registrationDataMapper.mapRegistrationData(
         application.getId(), application.getDateRegistrationSubmitted(), registrationSchema);
   }
@@ -128,12 +126,15 @@ public class RegistrationSubmitter {
   }
 
   private void setApplicationState(Application application) {
-    var registrationCompleted =
-        History.builder()
-            .state(ApplicationState.HEALTH_AND_DISABILITY.toString())
-            .timeStamp(clock.instant())
-            .build();
-    application.getState().addHistory(registrationCompleted);
+    application
+        .getState()
+        .addHistory(
+            History.builder()
+                .state(ApplicationState.HEALTH_AND_DISABILITY.toString())
+                .timeStamp(clock.instant())
+                .build());
+    applicationCoordinatorService.updateState(
+        application.getId(), StateDto.CurrentStateEnum.HEALTH_AND_DISABILITY);
   }
 
   private void setAudit(Application application) {
@@ -151,8 +152,10 @@ public class RegistrationSubmitter {
                 + "is pending and time lock active");
       }
     }
-    var currentApplicationState = application.getState().getCurrent();
-    if (ApplicationState.valueOf(currentApplicationState).getValue()
+    var currentApplicationState =
+        applicationCoordinatorService.getApplicationState(application.getId());
+
+    if (ApplicationState.valueOf(currentApplicationState.getCurrent()).getValue()
             == ApplicationState.SUBMITTED.getValue()
         || application.getRegistrationData().getData() == null) {
       throw new ProhibitedActionException(
@@ -161,14 +164,14 @@ public class RegistrationSubmitter {
   }
 
   private void setHealthDisabilityFormData(
-      RegistrationSchema130 registrationSchema, Application application) {
+      RegistrationSchema140 registrationSchema, Application application) {
     var aboutYourHealthFromRegistration = registrationSchema.getAboutYourHealth();
     var healthProfessionalsDetailsList =
         aboutYourHealthFromRegistration != null
             ? aboutYourHealthFromRegistration.getHealthProfessionalsDetails()
             : null;
 
-    var aboutYourHealth = new AboutYourHealthSchema110();
+    var aboutYourHealth = new AboutYourHealthSchema120();
     aboutYourHealth.setHealthProfessionalsDetails(
         healthProfessionalsDetailsList != null
             ? List.copyOf(healthProfessionalsDetailsList)

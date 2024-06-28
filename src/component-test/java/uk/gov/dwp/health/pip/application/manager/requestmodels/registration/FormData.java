@@ -47,6 +47,7 @@ public class FormData {
       @Default private String enterBankDetail = "No";
       @Default private String accountNumber = "12341234";
       @Default private String sortCode = "123123";
+      @Default private String accountName = "John Doe";
     }
 
     @Default private Address address = Address.builder().build();

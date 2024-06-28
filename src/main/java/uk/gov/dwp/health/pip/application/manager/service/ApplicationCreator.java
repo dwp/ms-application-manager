@@ -1,5 +1,9 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,13 +19,6 @@ import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationCreat
 import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -29,6 +26,7 @@ public class ApplicationCreator {
 
   private final ApplicationProperties applicationProperties;
   private final ApplicationRepository applicationRepository;
+  private final ApplicationCoordinatorService applicationCoordinatorService;
   private final Clock clock;
 
   public ApplicationDto createApplication(ApplicationCreateDto applicationCreateDto) {
@@ -50,23 +48,17 @@ public class ApplicationCreator {
 
     log.info("Created new application");
 
+    applicationCoordinatorService.postApplicationId(savedApplication.getId());
+
     return applicationDto;
   }
 
   private boolean hasActiveApplication(String claimantId) {
     List<Application> applications = applicationRepository.findAllByClaimantId(claimantId);
 
-    List<Application> activeApplications =
-        applications.stream()
-            .filter(
-                application -> {
-                  String current = application.getState().getCurrent();
-                  return ApplicationState.valueOf(current).getValue()
-                      < ApplicationState.SUBMITTED.getValue();
-                })
-            .collect(Collectors.toList());
+    List<String> ids = applications.stream().map(Application::getId).toList();
 
-    return !activeApplications.isEmpty();
+    return applicationCoordinatorService.hasActiveApplications(ids);
   }
 
   private Application toModel(ApplicationCreateDto applicationCreateDto) {
@@ -83,7 +75,7 @@ public class ApplicationCreator {
         .benefitCode(applicationCreateDto.getBenefitType().getValue())
         .claimantId(applicationCreateDto.getClaimantId())
         .effectiveFrom(today)
-        .effectiveTo(today.plus(applicationProperties.getActiveDuration(), ChronoUnit.DAYS))
+        .effectiveTo(today.plusDays(applicationProperties.getActiveDuration()))
         .language(Language.valueOf(applicationCreateDto.getLanguage().getValue()))
         .state(applicationState)
         .registrationData(FormData.builder().build())

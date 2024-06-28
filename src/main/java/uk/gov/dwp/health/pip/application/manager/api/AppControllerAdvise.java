@@ -1,5 +1,6 @@
 package uk.gov.dwp.health.pip.application.manager.api;
 
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,13 +11,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.RestClientException;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.exception.MessagingEventException;
 import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.openapi.healthdisability.v1.dto.ErrorResponseObject;
 
-import jakarta.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
 
 @Component

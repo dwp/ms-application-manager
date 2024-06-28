@@ -1,5 +1,17 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,25 +29,13 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class RegistrationDataUpdaterTest {
 
   @InjectMocks private RegistrationDataUpdater registrationDataUpdater;
   @Mock private ApplicationRepository repository;
+  @Mock private ApplicationCoordinatorService applicationCoordinatorService;
   @Mock private Clock clock;
   @Captor private ArgumentCaptor<String> applicationIdArgumentCaptor;
   @Captor private ArgumentCaptor<Application> applicationArgumentCaptor;
@@ -57,14 +57,23 @@ class RegistrationDataUpdaterTest {
 
   @Test
   void when_update_registration_data_registration_data_audit_updated() {
+
     var applicationId = UUID.randomUUID().toString();
     var now = Instant.now();
+
     var formDataDto = new FormDataDto();
     formDataDto.setFormData("{NEW_FORM_DATA}");
     formDataDto.setMeta("meta");
+
     var existingApplication = applicationFixture();
+
+    existingApplication.setId(applicationId);
+
     when(repository.findById(anyString())).thenReturn(Optional.of(existingApplication));
     when(clock.instant()).thenReturn(now);
+    when(applicationCoordinatorService.getApplicationState(applicationId))
+        .thenReturn(State.builder().current("REGISTRATION").build());
+
     registrationDataUpdater.updateRegistrationDataByApplicationId(applicationId, formDataDto);
 
     verify(repository).findById(applicationIdArgumentCaptor.capture());
@@ -81,10 +90,17 @@ class RegistrationDataUpdaterTest {
 
   @Test
   void when_update_application_throws_exception_application_status_not_allowed_to_be_updated() {
+
     var applicationId = UUID.randomUUID().toString();
-    var application = new Application();
-    application.setState(State.builder().current("SUBMITTED").build());
+    var application = Application.builder()
+            .id(applicationId)
+            .state(State.builder().current("SUBMITTED").build())
+            .build();
+
     when(repository.findById(anyString())).thenReturn(Optional.of(application));
+    when(applicationCoordinatorService.getApplicationState(applicationId))
+        .thenReturn(State.builder().current("SUBMITTED").build());
+
     var formDataDto = new FormDataDto();
     assertThatThrownBy(
             () ->

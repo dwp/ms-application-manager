@@ -1,5 +1,18 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -18,19 +31,6 @@ import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundEx
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.when;
-
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -40,14 +40,23 @@ class RegistrationDataGetterTest {
 
   @InjectMocks private RegistrationDataGetter registrationDataGetter;
   @Mock private ApplicationRepository repository;
+  @Mock private ApplicationCoordinatorService applicationCoordinatorService;
 
   @Nested
   class GetByClaimantIdTest {
 
     @Test
     void when_application_for_claimant_initial_gather_then_return_registration_data() {
+
+      String applicationId = "application-id-1";
+
+      Application application = Application.builder().id(applicationId).build();
+
       when(repository.findAllByClaimantId(CLAIMANT_ID))
-          .thenReturn(Collections.singletonList(getUnsubmittedApplication("application-id-1")));
+          .thenReturn(Collections.singletonList(getUnsubmittedApplication(applicationId)));
+      when(applicationCoordinatorService.getRegistrationApplicationIds(anyList()))
+          .thenReturn(Collections.singletonList(applicationId));
+
       var registrationDto = registrationDataGetter.getRegistrationDataByClaimantId(CLAIMANT_ID);
       assertAll(
           "Form data dto",
@@ -81,17 +90,21 @@ class RegistrationDataGetterTest {
 
     @Test
     void when_multiple_registration_data_for_claimant_then_illegal_state() {
+
+      Application application1 = getUnsubmittedApplication(UUID.randomUUID().toString());
+      Application application2 = getUnsubmittedApplication(UUID.randomUUID().toString());
+
       when(repository.findAllByClaimantId(CLAIMANT_ID))
-          .thenReturn(
-              List.of(
-                  getUnsubmittedApplication(UUID.randomUUID().toString()),
-                  getUnsubmittedApplication(UUID.randomUUID().toString())));
+          .thenReturn(List.of(application1, application2));
+
+      when(applicationCoordinatorService.getRegistrationApplicationIds(anyList()))
+          .thenReturn(List.of(application1.getId(), application2.getId()));
+
       assertThatThrownBy(() -> registrationDataGetter.getRegistrationDataByClaimantId(CLAIMANT_ID))
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("ERROR: multiple registration data found for claimant");
     }
 
-    @Test
     void when_multiple_active_applications_for_claimant_then_return_registration_data() {
       when(repository.findAllByClaimantId(CLAIMANT_ID))
           .thenReturn(

@@ -1,5 +1,6 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import java.time.Clock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,9 +8,8 @@ import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.StateDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-
-import java.time.Clock;
 
 @RequiredArgsConstructor
 @Service
@@ -17,6 +17,7 @@ import java.time.Clock;
 public class HealthDataSubmitterV2 {
 
   private final ApplicationRepository applicationRepository;
+  private final ApplicationCoordinatorService applicationCoordinatorService;
   private final Clock clock;
 
   public void submitHealthData(String applicationId, String submissionId) {
@@ -37,12 +38,15 @@ public class HealthDataSubmitterV2 {
   }
 
   private void setApplicationState(Application application) {
-    var registrationCompleted =
-        History.builder()
-            .state(ApplicationState.SUBMITTED.name())
-            .timeStamp(clock.instant())
-            .build();
-    application.getState().addHistory(registrationCompleted);
+    application
+        .getState()
+        .addHistory(
+            History.builder()
+                .state(ApplicationState.SUBMITTED.name())
+                .timeStamp(clock.instant())
+                .build());
+    applicationCoordinatorService.updateState(
+        application.getId(), StateDto.CurrentStateEnum.SUBMITTED);
   }
 
   private void setAudit(Application application) {

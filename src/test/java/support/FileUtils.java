@@ -3,7 +3,7 @@ package support;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,10 +15,16 @@ import java.util.stream.Collectors;
 
 public class FileUtils {
 
-  public static RegistrationSchema130 getRegistrationDataFromFile(String registrationDataJsonFile)
+  public static RegistrationSchema140 getRegistrationDataFromFile(String registrationDataJsonFile)
       throws IOException {
     Map<String, Object> registrationDataJson = readTestFile(registrationDataJsonFile);
     return parseJson(registrationDataJson);
+  }
+  
+  public static RegistrationSchema140 getNewRegistrationDataFromFile(String registrationDataJsonFile)
+    throws IOException {
+    Map<String, Object> registrationDataJson = readTestFile(registrationDataJsonFile);
+    return parseUpdatedJson(registrationDataJson);
   }
 
   public static Map<String, Object> readTestFile(String file) throws IOException {
@@ -45,8 +51,12 @@ public class FileUtils {
     return json;
   }
 
-  private static RegistrationSchema130 parseJson(Map<String, Object> registrationDataJson) {
-    return parseJson(registrationDataJson, RegistrationSchema130.class);
+  private static RegistrationSchema140 parseJson(Map<String, Object> registrationDataJson) {
+    return parseJson(registrationDataJson, RegistrationSchema140.class);
+  }
+  
+  private static RegistrationSchema140 parseUpdatedJson(Map<String, Object> registrationDataJson) {
+    return parseJson(registrationDataJson, RegistrationSchema140.class);
   }
 
   private static <T> T parseJson(Map<String, Object> registrationDataJson, Class<T> clazz) {

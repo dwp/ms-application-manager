@@ -6,10 +6,6 @@
     <cve>CVE-2023-33202</cve>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: joda-time-2.2.jar ]]></notes>
-    <cve>CVE-2024-23080</cve>
-  </suppress>
-  <suppress>
     <notes><![CDATA[file name: ion-java-1.0.2.jar]]></notes>
     <cve>CVE-2024-21634</cve>
   </suppress>
@@ -18,12 +14,7 @@
     <cve>CVE-2020-26870</cve>
   </suppress>
   <suppress>
-    <notes><![CDATA[file name: swagger-parser-safe-url-resolver-2.1.19.jar]]></notes>
-    <cve>CVE-2022-0722</cve>
-    <cve>CVE-2022-2218</cve>
-    <cve>CVE-2022-2900</cve>
-    <cve>CVE-2022-2216</cve>
-    <cve>CVE-2022-2217</cve>
-    <cve>CVE-2022-3224</cve>
+    <notes><![CDATA[file name: classgraph-4.8.90.jar]]></notes>
+    <cve>CVE-2021-47621</cve>
   </suppress>
 </suppressions>

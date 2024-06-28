@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema100.AccommodationType;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HospitalHospiceOrCarehomeSchema110;
 import uk.gov.dwp.health.pip.pipcsapimodeller.registration.carehome.HospitalAndOtherAccomDetails;
+import uk.gov.dwp.health.pip.pipcsapimodeller.registration.type.YesNoDontKnow;
 
 import java.time.LocalDate;
 
@@ -22,15 +22,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Tag("unit")
 class HospitalAndOtherAccomDetailsMapperTest {
   private HospitalAndOtherAccomDetailsMapper hospitalAndOtherAccomDetailsMapper;
-  private HospitalHospiceOrCarehomeSchema100 hospitalHospiceOrCarehome;
+  private HospitalHospiceOrCarehomeSchema110 hospitalHospiceOrCarehome;
 
   @BeforeEach
   void beforeEach() {
-    hospitalAndOtherAccomDetailsMapper =
-        new HospitalAndOtherAccomDetailsMapper(
-            new FormCommons(new ObjectMapper()), new PostcodeMapper());
+    hospitalAndOtherAccomDetailsMapper = new HospitalAndOtherAccomDetailsMapper(
+        new FormCommonsV2(new ObjectMapper()), new PostcodeMapper());
 
-    hospitalHospiceOrCarehome = new HospitalHospiceOrCarehomeSchema100();
+    hospitalHospiceOrCarehome = new HospitalHospiceOrCarehomeSchema110();
   }
 
   @Nested
@@ -41,14 +40,18 @@ class HospitalAndOtherAccomDetailsMapperTest {
       hospitalHospiceOrCarehome.setAdditionalProperty("admissionDate", LocalDate.now().toString());
       hospitalHospiceOrCarehome.setAdditionalProperty("accommodationName", "accommodation-name");
       hospitalHospiceOrCarehome.setAdditionalProperty("address", getCareProviderAddress());
+      hospitalHospiceOrCarehome.setAdditionalProperty("costsPaid", "charity");
+      hospitalHospiceOrCarehome.setAdditionalProperty("agreeToRepay", "Yes");
+      hospitalHospiceOrCarehome.setAdditionalProperty("payingOrgName", "Test Org");
+      hospitalHospiceOrCarehome.setAdditionalProperty("privatePatientPaying", "Yes");
     }
 
     @Test
     void when_accommodation_type_care_home() {
-      hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.CAREHOME);
+      hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.CAREHOME);
 
-      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-          hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails = hospitalAndOtherAccomDetailsMapper
+          .getHospitalAndOtherAccomDetails(
               hospitalHospiceOrCarehome);
 
       assertThat(hospitalAndOtherAccomDetails.getAccommodationType())
@@ -58,10 +61,10 @@ class HospitalAndOtherAccomDetailsMapperTest {
 
     @Test
     void when_accommodation_type_hospice() {
-      hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.HOSPICE);
+      hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.HOSPICE);
 
-      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-          hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails = hospitalAndOtherAccomDetailsMapper
+          .getHospitalAndOtherAccomDetails(
               hospitalHospiceOrCarehome);
 
       assertThat(hospitalAndOtherAccomDetails.getAccommodationType()).isEqualTo("Hospice");
@@ -70,10 +73,10 @@ class HospitalAndOtherAccomDetailsMapperTest {
 
     @Test
     void when_accommodation_type_hospital() {
-      hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.HOSPITAL);
+      hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.HOSPITAL);
 
-      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-          hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails = hospitalAndOtherAccomDetailsMapper
+          .getHospitalAndOtherAccomDetails(
               hospitalHospiceOrCarehome);
 
       assertThat(hospitalAndOtherAccomDetails.getAccommodationType()).isEqualTo("Hospital");
@@ -82,10 +85,10 @@ class HospitalAndOtherAccomDetailsMapperTest {
 
     @Test
     void when_accommodation_type_other() {
-      hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.OTHER);
+      hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.OTHER);
 
-      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-          hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+      HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails = hospitalAndOtherAccomDetailsMapper
+          .getHospitalAndOtherAccomDetails(
               hospitalHospiceOrCarehome);
 
       assertThat(hospitalAndOtherAccomDetails.getAccommodationType()).isEqualTo("Other");
@@ -113,24 +116,30 @@ class HospitalAndOtherAccomDetailsMapperTest {
       assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getLine3())
           .isEqualTo("address-line-2");
       assertThat(
-              hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getTownOrCity())
+          hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getTownOrCity())
           .isEqualTo("town");
       assertThat(
-              hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getPostcode())
+          hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getPostcode())
           .isEqualTo("ls1 1ab");
       assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getCounty())
           .isEqualTo("county");
       assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails().getCountry())
           .isEqualTo("England");
+      assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomPrivatePatientPaying())
+          .isEqualTo(YesNoDontKnow.YES.toString());
+      assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAgreeToRepay())
+          .isEqualTo(YesNoDontKnow.YES.toString());
+      assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomCostsPaid()).isEqualTo("Charity");
+      assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomPayingOrgName()).isEqualTo("Test Org");
     }
   }
 
   @Test
   void when_accommodation_type_none() {
-    hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.NONE);
+    hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.NONE);
 
-    HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-        hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+    HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails = hospitalAndOtherAccomDetailsMapper
+        .getHospitalAndOtherAccomDetails(
             hospitalHospiceOrCarehome);
 
     assertThat(hospitalAndOtherAccomDetails).isNull();
@@ -141,23 +150,26 @@ class HospitalAndOtherAccomDetailsMapperTest {
     hospitalHospiceOrCarehome.setAccommodationType(null);
 
     assertThatThrownBy(
-            () ->
-                hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
-                    hospitalHospiceOrCarehome))
+        () -> hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+            hospitalHospiceOrCarehome))
         .isInstanceOf(RegistrationDataNotValid.class)
         .hasMessage("Registration data not valid. Accommodation type not provided.");
   }
-
+  
   @Test
   void when_accommodation_type_hospital_no_additional_properties() {
-    hospitalHospiceOrCarehome.setAccommodationType(AccommodationType.HOSPITAL);
+    hospitalHospiceOrCarehome.setAccommodationType(HospitalHospiceOrCarehomeSchema110.AccommodationType.HOSPITAL);
 
     HospitalAndOtherAccomDetails hospitalAndOtherAccomDetails =
-        hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
-            hospitalHospiceOrCarehome);
+      hospitalAndOtherAccomDetailsMapper.getHospitalAndOtherAccomDetails(
+        hospitalHospiceOrCarehome);
 
     assertThat(hospitalAndOtherAccomDetails.getAccommodationType()).isEqualTo("Hospital");
     assertThat(hospitalAndOtherAccomDetails.getAdmissionDate()).isNull();
     assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAddressDetails()).isNull();
+    assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomCostsPaid()).isNull();
+    assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomAgreeToRepay()).isNull();
+    assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomPayingOrgName()).isNull();
+    assertThat(hospitalAndOtherAccomDetails.getHospitalAndOtherAccomPrivatePatientPaying()).isNull();
   }
 }

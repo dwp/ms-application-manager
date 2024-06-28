@@ -1,5 +1,14 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
@@ -15,19 +24,10 @@ import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +40,7 @@ class ApplicationStatusGetterTest {
   @InjectMocks private ApplicationStatusGetter applicationStatusGetter;
   @Mock private ApplicationRepository repository;
   @Mock private RegistrationDataMarshaller registrationDataMarshaller;
+  @Mock private ApplicationCoordinatorService applicationCoordinatorService;
   @Captor private ArgumentCaptor<String> stringArgumentCaptor;
 
   @Test
@@ -54,20 +55,24 @@ class ApplicationStatusGetterTest {
 
   @Test
   void when_registration_not_submitted() {
-    var application = new Application();
-    var state = new State();
+    Application application = new Application();
+    String applicationId = "application-id-1";
+
+    State state = new State();
     state.setCurrent("REGISTRATION");
     application.setState(state);
-    application.setId("application-id-1");
+    application.setId(applicationId);
 
     when(repository.findAllByClaimantId("claimant-id-1"))
         .thenReturn(Collections.singletonList(application));
+    when(applicationCoordinatorService.getApplicationState(applicationId))
+        .thenReturn(state);
 
-    var applicationStatusDto =
+    ApplicationStatusDto applicationStatusDto =
         applicationStatusGetter.getApplicationStatusByClaimantId("claimant-id-1");
 
-    assertThat(applicationStatusDto.getApplicationStatus().getValue()).isEqualTo("REGISTRATION");
-    assertThat(applicationStatusDto.getApplicationId()).isEqualTo("application-id-1");
+    assertThat(applicationStatusDto.getApplicationStatus().getValue()).isEqualTo(state.getCurrent());
+    assertThat(applicationStatusDto.getApplicationId()).isEqualTo(applicationId);
     assertThat(applicationStatusDto.getSubmissionId()).isNull();
     assertThat(applicationStatusDto.getSurname()).isNull();
     assertThat(applicationStatusDto.getForename()).isNull();
@@ -78,10 +83,14 @@ class ApplicationStatusGetterTest {
 
   @Test
   void when_healthdisability_not_submitted() {
-    var application =
+
+    String applicationId = "application-id-1";
+    State state = State.builder().current("HEALTH_AND_DISABILITY").build();
+
+    Application application =
         Application.builder()
-            .id("application-id-1")
-            .state(State.builder().current("HEALTH_AND_DISABILITY").build())
+            .id(applicationId)
+            .state(state)
             .registrationData(FormData.builder().data("registration-data").build())
             .build();
 
@@ -89,13 +98,13 @@ class ApplicationStatusGetterTest {
         .thenReturn(Collections.singletonList(application));
     when(registrationDataMarshaller.marshallRegistrationData("registration-data"))
         .thenReturn(getRegistrationSchemaFixture());
-
-    var applicationStatusDto =
+    when(applicationCoordinatorService.getApplicationState(applicationId)).thenReturn(state);
+    ApplicationStatusDto applicationStatusDto =
         applicationStatusGetter.getApplicationStatusByClaimantId("claimant-id-1");
 
     assertThat(applicationStatusDto.getApplicationStatus().getValue())
-        .isEqualTo("HEALTH_AND_DISABILITY");
-    assertThat(applicationStatusDto.getApplicationId()).isEqualTo("application-id-1");
+        .isEqualTo(state.getCurrent());
+    assertThat(applicationStatusDto.getApplicationId()).isEqualTo(applicationId);
     assertThat(applicationStatusDto.getSubmissionId()).isNull();
     assertThat(applicationStatusDto.getSurname()).isEqualTo("surname-1");
     assertThat(applicationStatusDto.getForename()).isEqualTo("forename-1");
@@ -106,14 +115,19 @@ class ApplicationStatusGetterTest {
 
   @Test
   void when_application_submitted() {
-    var application =
+
+    State state = State.builder().current("SUBMITTED").build();
+    String applicationId = "application-id-1";
+
+    Application application =
         Application.builder()
-            .id("application-id-1")
-            .state(State.builder().current("SUBMITTED").build())
+            .id(applicationId)
+            .state(state)
             .registrationData(FormData.builder().data("registration-data").build())
             .submissionId("submission-id-1")
             .build();
 
+    when(applicationCoordinatorService.getApplicationState(applicationId)).thenReturn(state);
     when(repository.findAllByClaimantId(anyString()))
         .thenReturn(Collections.singletonList(application));
     when(registrationDataMarshaller.marshallRegistrationData("registration-data"))
@@ -122,8 +136,9 @@ class ApplicationStatusGetterTest {
     var applicationStatusDto =
         applicationStatusGetter.getApplicationStatusByClaimantId("claimant-id-1");
 
-    assertThat(applicationStatusDto.getApplicationStatus().getValue()).isEqualTo("SUBMITTED");
-    assertThat(applicationStatusDto.getApplicationId()).isEqualTo("application-id-1");
+    assertThat(applicationStatusDto.getApplicationStatus().getValue())
+        .isEqualTo(state.getCurrent());
+    assertThat(applicationStatusDto.getApplicationId()).isEqualTo(applicationId);
     assertThat(applicationStatusDto.getSubmissionId()).isEqualTo("submission-id-1");
     assertThat(applicationStatusDto.getSurname()).isEqualTo("surname-1");
     assertThat(applicationStatusDto.getForename()).isEqualTo("forename-1");
@@ -132,18 +147,18 @@ class ApplicationStatusGetterTest {
     assertThat(applicationStatusDto.getPostcode()).isEqualTo("postcode-1");
   }
 
-  private RegistrationSchema130 getRegistrationSchemaFixture() {
+  private RegistrationSchema140 getRegistrationSchemaFixture() {
     var addressSchema = new AddressSchema100();
     addressSchema.setPostcode("postcode-1");
 
-    var personalDetails = new PersonalDetailsSchema110();
+    var personalDetails = new PersonalDetailsSchema120();
     personalDetails.setSurname("surname-1");
     personalDetails.setFirstname("forename-1");
     personalDetails.setDob("date-of-birth-1");
     personalDetails.setNino("nino-1");
     personalDetails.setAddress(addressSchema);
 
-    var registrationSchema = new RegistrationSchema130();
+    var registrationSchema = new RegistrationSchema140();
     registrationSchema.setPersonalDetails(personalDetails);
 
     return registrationSchema;
@@ -153,29 +168,28 @@ class ApplicationStatusGetterTest {
   void should_throw_application_not_found_exception_when_application_id_not_exist() {
     when(repository.findById(anyString())).thenReturn(Optional.empty());
     assertThatThrownBy(() -> applicationStatusGetter.getClaimantIdAndStatus(APPLICATION_ID))
-            .isInstanceOf(ApplicationNotFoundException.class)
-            .hasMessage(String.format("No application found for given application id %s", APPLICATION_ID));
+        .isInstanceOf(ApplicationNotFoundException.class)
+        .hasMessage(
+            String.format("No application found for given application id %s", APPLICATION_ID));
     verify(repository).findById(stringArgumentCaptor.capture());
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(APPLICATION_ID);
   }
 
   @Test
   void when_application_exists_for_claimant_id_and_status_request() {
+    State state = State.builder().current("SUBMITTED").build();
+    String applicationId = "application-id-1";
+
     var application =
-            Application.builder()
-                    .id("application-id-1")
-                    .claimantId("claimant-id-1")
-                    .state(State.builder().current("SUBMITTED").build())
-                    .build();
+        Application.builder().id(applicationId).claimantId("claimant-id-1").state(state).build();
 
-    when(repository.findById(anyString()))
-            .thenReturn(Optional.of(application));
+    when(repository.findById(anyString())).thenReturn(Optional.of(application));
 
-    var claimantStatusDto =
-            applicationStatusGetter.getClaimantIdAndStatus("application-id-1");
+    when(applicationCoordinatorService.getApplicationState(applicationId)).thenReturn(state);
 
-    assertThat(claimantStatusDto.getApplicationStatus().getValue()).isEqualTo("SUBMITTED");
+    var claimantStatusDto = applicationStatusGetter.getClaimantIdAndStatus(applicationId);
+
+    assertThat(claimantStatusDto.getApplicationStatus().getValue()).isEqualTo(state.getCurrent());
     assertThat(claimantStatusDto.getClaimantId()).isEqualTo("claimant-id-1");
-
   }
 }

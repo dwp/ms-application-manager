@@ -1,10 +1,15 @@
 package uk.gov.dwp.health.pip.application.manager.api.registration;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationUrl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import uk.gov.dwp.health.pip.application.manager.api.ApiTest;
 import uk.gov.dwp.health.pip.application.manager.config.MongoClientConnection;
+import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Registration;
@@ -12,10 +17,6 @@ import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Upda
 import uk.gov.dwp.health.pip.application.manager.responsemodels.CreatedApplication;
 import uk.gov.dwp.health.pip.application.manager.responsemodels.Error;
 import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPutRegistrationUrl;
 
 public class PutApplicationIT extends ApiTest {
   String url;
@@ -50,8 +51,10 @@ public class PutApplicationIT extends ApiTest {
   @Test
   public void shouldReturn403StatusCodeWhenApplicationStatusNotRegistered() {
     MongoTemplate mongoTemplate = MongoClientConnection.getMongoTemplate();
-    var application1 =
+
+    Application application1 =
         uk.gov.dwp.health.pip.application.manager.entity.Application.builder()
+            .id("5ed0d430716609122be7a4d7")
             .claimantId("300000000000000000000409")
             .state(State.builder().current(ApplicationState.SUBMITTED.name()).build())
             .build();

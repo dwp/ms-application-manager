@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-parent</artifactId>
-      <version>3.2.4</version>
-      <relativePath/> <!-- lookup parent from repository -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.4</version>
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>uk.gov.dwp.health.pip</groupId>
     <artifactId>ms-application-manager</artifactId>
-    <version>2.11.0</version>
+    <version>2.14.0</version>
     <name>ms-pip-application-manager</name>
     <description>Strategic pip-apply micro service handle applicant application</description>
 
@@ -28,7 +28,7 @@
         <dwp-mongo-change-stream-starter.version>4.2.0-359f3f54</dwp-mongo-change-stream-starter.version>
         <dwp-meta-data-logger.version>2.0.0-f17eb705</dwp-meta-data-logger.version>
         <gson-fire.version>1.9.0</gson-fire.version>
-        <pipcs-api-model.version>1.3.0-7b669564</pipcs-api-model.version>
+        <pipcs-api-model.version>1.4.0-4dc49bf8</pipcs-api-model.version>
 <!--        Added spring web ref to upgrade beyond a vulnerability in 6.1.5 -->
         <spring-web.version>6.1.6</spring-web.version>
         <guava.version>33.1.0-jre</guava.version>
@@ -41,7 +41,7 @@
         <plugin.maven.compiler.version>3.11.0</plugin.maven.compiler.version>
         <plugin.spotbugs.version>4.7.3.0</plugin.spotbugs.version>
         <spotbugs.version>4.7.3</spotbugs.version>
-        <plugin.maven.owasp.version>9.0.9</plugin.maven.owasp.version>
+        <plugin.maven.owasp.version>9.2.0</plugin.maven.owasp.version>
         <plugin.maven.jacoco.version>0.8.8</plugin.maven.jacoco.version>
         <plugin.projectinfo.version>3.1.1</plugin.projectinfo.version>
         <plugin.surefire.version>3.0.0-M7</plugin.surefire.version>
@@ -69,11 +69,19 @@
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <opentelemetry-bom.version>1.34.1</opentelemetry-bom.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
+        <spring-web.version>6.1.6</spring-web.version>
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <netty-codec-http.version>4.1.108.Final</netty-codec-http.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.17.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-bom</artifactId>
@@ -94,6 +102,11 @@
                 <version>${amazon.sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring-web.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -175,7 +188,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.16.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -432,7 +444,6 @@
                 <artifactId>dependency-check-maven</artifactId>
                 <version>${plugin.maven.owasp.version}</version>
                 <configuration>
-                    <cveValidForHours>12</cveValidForHours>
                     <failBuildOnCVSS>4</failBuildOnCVSS>
                     <nvdDatafeedUrl>https://gitlab.com/api/v4/projects/53085284/packages/generic/cache/2.0/nvdcve-{0}.json.gz</nvdDatafeedUrl>
                     <suppressionFile>src/main/resources/DependencySuppression.xml</suppressionFile>
@@ -487,6 +498,9 @@
                 </executions>
                 <configuration>
                     <excludes>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/application/v2/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/application/v2/dto/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/api/v2/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/bankdetails/v1/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/bankdetails/v1/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/bankdetails/v2/dto/*</exclude>
@@ -511,6 +525,9 @@
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v3/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/dto/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/auth/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/entity/enums/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/event/model/**</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/model/**</exclude>
@@ -621,6 +638,35 @@
                                 <artifactVersion>${project.version}</artifactVersion>
                                 <bigDecimalAsString>true</bigDecimalAsString>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <interfaceOnly>true</interfaceOnly>
+                                <java8>true</java8>
+                                <useBeanValidation>true</useBeanValidation>
+                                <delegatePattern>true</delegatePattern>
+                                <useJakartaEe>true</useJakartaEe>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-registration-api-v4</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>
+                                ${project.basedir}/schemas/api-spec/ms-application-manager/openapi-spec-registration-v4.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <modelPackage>${client.base.package.name}.openapi.registration.v4.dto</modelPackage>
+                            <apiPackage>${client.base.package.name}.openapi.registration.v4</apiPackage>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
+                            <configOptions>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <artifactVersion>${project.version}</artifactVersion>
+                                <bigDecimalAsString>true</bigDecimalAsString>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <dateLibrary>java8</dateLibrary>
                                 <interfaceOnly>true</interfaceOnly>
                                 <java8>true</java8>
                                 <useBeanValidation>true</useBeanValidation>
@@ -766,6 +812,44 @@
                             </configOptions>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-coordinator-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/schemas/api-spec/ms-pip-application-coordinator/openapi-spec-v1.yaml</inputSpec>
+                            <addCompileSourceRoot>true</addCompileSourceRoot>
+                            <globalProperties>
+                                <skipFormModel>false</skipFormModel>
+                            </globalProperties>
+                            <configOptions>
+                                <inputSpec>${project.basedir}/schemas/api-spec/ms-pip-application-coordinator/openapi-spec-v1.yaml</inputSpec>
+                                <modelPackage>${client.base.package.name}.openapi.coordinator.dto</modelPackage>
+                                <apiPackage>${client.base.package.name}.openapi.coordinator</apiPackage>
+                                <invokerPackage>${client.base.package.name}.openapi.coordinator</invokerPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <java8>true</java8>
+                                <library>resttemplate</library>
+                                <sourceFolder>./</sourceFolder>
+                                <useJakartaEe>true</useJakartaEe>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <artifactVersion>${project.version}</artifactVersion>
+                                <bigDecimalAsString>true</bigDecimalAsString>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useBeanValidation>true</useBeanValidation>
+                                <delegatePattern>true</delegatePattern>
+                            </configOptions>
+                            <apiNameSuffix>MsCoordinatorClient</apiNameSuffix>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generatorName>java</generatorName>
+                            <library>resttemplate</library>
+                            <output>${project.build.directory}/generated-sources/ms-coordinator</output>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -883,6 +967,7 @@
                                 <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.1.0.json</sourcePath>
                                 <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.2.0.json</sourcePath>
                                 <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.3.0.json</sourcePath>
+                                <sourcePath>${project.basedir}/schemas/registration/registration.schema.1.4.0.json</sourcePath>
                             </sourcePaths>
                             <targetPackage>uk.gov.dwp.health.pip.application.manager.model.registration.data</targetPackage>
                             <useJakartaValidation>true</useJakartaValidation>

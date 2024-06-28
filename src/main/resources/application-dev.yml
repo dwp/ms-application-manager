@@ -29,4 +29,5 @@ pip:
     resubmit:
       timeout:
         second: 3600
-
+  coordinator:
+    baseUrl: "http://localhost:9990"

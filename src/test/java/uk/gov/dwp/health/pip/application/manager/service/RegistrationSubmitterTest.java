@@ -13,6 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import uk.gov.dwp.health.mongo.changestream.config.properties.Channel;
 import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.constant.RegistrationState;
@@ -27,10 +29,11 @@ import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionExcep
 import uk.gov.dwp.health.pip.application.manager.exception.RegistrationDataNotValid;
 import uk.gov.dwp.health.pip.application.manager.messaging.PipcsApiMessagePublisher;
 import uk.gov.dwp.health.pip.application.manager.messaging.properties.InboundEventProperties;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetailsSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema110;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.HealthProfessionalsDetailsSchema110;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
+import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 import uk.gov.dwp.health.pip.application.manager.service.mapper.RegistrationDataMapperForPipcs;
 import uk.gov.dwp.health.pip.pipcsapimodeller.Pip1RegistrationForm;
@@ -68,6 +71,7 @@ class RegistrationSubmitterTest {
   @Mock private InboundEventProperties inboundEventProperties;
   @Mock private RegistrationDataMapperForPipcs registrationDataMapper;
   @Mock private RegistrationDataMarshaller registrationDataMarshaller;
+  @Mock private ApplicationCoordinatorService applicationCoordinatorService;
 
   @BeforeAll
   static void setup() {
@@ -91,9 +95,15 @@ class RegistrationSubmitterTest {
   @Test
   void when_application_submitted_then_throw_prohibited_action_exception() {
     var application =
-        Application.builder().state(State.builder().current("SUBMITTED").build()).build();
+        Application.builder()
+                .id(APPLICATION_ID)
+                .state(State.builder().current("SUBMITTED").build())
+                .build();
 
+    when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
+            .thenReturn(State.builder().current("SUBMITTED").build());
     when(repository.findById(anyString())).thenReturn(Optional.of(application));
+
     assertThatThrownBy(() -> registrationSubmitter.submitRegistrationData(APPLICATION_ID))
         .isInstanceOf(ProhibitedActionException.class)
         .hasMessage("Registration data submission is not allowed after application submitted");
@@ -103,12 +113,17 @@ class RegistrationSubmitterTest {
   void when_registration_data_empty_then_throw_prohibited_action_exception() {
     var application =
         Application.builder()
-            .audit(Audit.builder().build())
-            .pipcsRegistrationState(State.builder().build())
-            .registrationData(FormData.builder().build())
-            .state(State.builder().current("REGISTRATION").build())
-            .build();
+                .id(APPLICATION_ID)
+                .audit(Audit.builder().build())
+                .pipcsRegistrationState(State.builder().build())
+                .registrationData(FormData.builder().build())
+                .state(State.builder().current("REGISTRATION").build())
+                .build();
+
     when(repository.findById(anyString())).thenReturn(Optional.of(application));
+    when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
+            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
+
     assertThatThrownBy(() -> registrationSubmitter.submitRegistrationData(APPLICATION_ID))
         .isInstanceOf(ProhibitedActionException.class)
         .hasMessage("Registration data submission is not allowed after application submitted");
@@ -118,14 +133,18 @@ class RegistrationSubmitterTest {
   void when_registration_data_not_valid() {
     Application application =
         Application.builder()
-            .audit(Audit.builder().build())
-            .pipcsRegistrationState(State.builder().build())
-            .registrationData(FormData.builder().data("{bad data}").build())
-            .state(State.builder().current("REGISTRATION").build())
-            .build();
-    when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
+                .id(APPLICATION_ID)
+                .audit(Audit.builder().build())
+                .pipcsRegistrationState(State.builder().build())
+                .registrationData(FormData.builder().data("{bad data}").build())
+                .state(State.builder().current("REGISTRATION").build())
+                .build();
+    when(repository.findById(APPLICATION_ID))
+            .thenReturn(Optional.of(application));
+    when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
+            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
     when(registrationDataMarshaller.marshallRegistrationData(any()))
-        .thenThrow(RegistrationDataNotValid.class);
+            .thenThrow(RegistrationDataNotValid.class);
 
     assertThatThrownBy(() -> registrationSubmitter.submitRegistrationData(APPLICATION_ID))
         .isInstanceOf(RegistrationDataNotValid.class);
@@ -137,17 +156,24 @@ class RegistrationSubmitterTest {
     var registrationSchema = getRegistrationSchemaFixture();
     var pip1RegistrationForm = getPip1RegistrationFormFixture();
 
-    when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
+    when(repository.findById(APPLICATION_ID))
+            .thenReturn(Optional.of(application));
     when(registrationDataMarshaller.marshallRegistrationData(any()))
-        .thenReturn(registrationSchema);
+            .thenReturn(registrationSchema);
     when(registrationDataMapper.mapRegistrationData(
             APPLICATION_ID, LocalDate.now(), registrationSchema))
-        .thenReturn(pip1RegistrationForm);
-    when(objectMapper.writeValueAsString(pip1RegistrationForm)).thenReturn("{pip-api-payload}");
-    when(inboundEventProperties.getTopicName()).thenReturn("pipcs-api-request");
+            .thenReturn(pip1RegistrationForm);
+    when(objectMapper.writeValueAsString(pip1RegistrationForm))
+            .thenReturn("{pip-api-payload}");
+    when(inboundEventProperties.getTopicName())
+            .thenReturn("pipcs-api-request");
     when(inboundEventProperties.getRoutingKeyRegistrationResponse())
-        .thenReturn("registration-response-routing-key");
-    when(clock.instant()).thenReturn(NOW);
+            .thenReturn("registration-response-routing-key");
+    when(clock.instant())
+            .thenReturn(NOW);
+    when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
+            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
+
     Channel channel = new Channel();
     channel.setCollection("application");
     channel.setInstanceId("instance-id-123");
@@ -169,17 +195,23 @@ class RegistrationSubmitterTest {
     var registrationSchema = getRegistrationSchemaFixture();
     var pip1RegistrationForm = getPip1RegistrationFormFixture();
 
-    when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
+    when(repository.findById(APPLICATION_ID))
+            .thenReturn(Optional.of(application));
     when(registrationDataMarshaller.marshallRegistrationData(any()))
-        .thenReturn(registrationSchema);
+            .thenReturn(registrationSchema);
     when(registrationDataMapper.mapRegistrationData(
             APPLICATION_ID, LocalDate.now(), registrationSchema))
         .thenReturn(pip1RegistrationForm);
-    when(objectMapper.writeValueAsString(pip1RegistrationForm)).thenReturn("{pip-api-payload}");
-    when(inboundEventProperties.getTopicName()).thenReturn("pipcs-api-request");
+    when(objectMapper.writeValueAsString(pip1RegistrationForm))
+            .thenReturn("{pip-api-payload}");
+    when(inboundEventProperties.getTopicName())
+            .thenReturn("pipcs-api-request");
     when(inboundEventProperties.getRoutingKeyRegistrationResponse())
         .thenReturn("registration-response-routing-key");
-    when(clock.instant()).thenReturn(NOW);
+    when(clock.instant())
+            .thenReturn(NOW);
+    when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
+            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
 
     registrationSubmitter.submitRegistrationData(APPLICATION_ID);
 
@@ -195,13 +227,18 @@ class RegistrationSubmitterTest {
   @Test
   void
       when_registration_status_pending_and_timeout_not_elapsed_then_ProhibitedActionException_thrown() {
+
     var application = getApplicationFixture();
     application.getPipcsRegistrationState().setCurrent(RegistrationState.PENDING.getLabel());
+
     when(clock.instant()).thenReturn(NOW);
+
     application.setAudit(
-        Audit.builder().lastModified(Instant.now().minus(9, ChronoUnit.SECONDS)).build());
+        Audit.builder().lastModified(Instant.now().minus(9, ChronoUnit.SECONDS))
+                .build());
     application.getState().setCurrent(ApplicationState.HEALTH_AND_DISABILITY.toString());
     when(repository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
+
     assertThatThrownBy(() -> registrationSubmitter.submitRegistrationData(APPLICATION_ID))
         .isInstanceOf(ProhibitedActionException.class)
         .hasMessage(
@@ -223,8 +260,8 @@ class RegistrationSubmitterTest {
           assertThat(application.getPipcsRegistrationState().getCurrent())
               .isEqualTo(RegistrationState.PENDING.getLabel());
           assertThat(application.getDateRegistrationSubmitted()).isEqualTo(LocalDate.now());
-          AboutYourHealthSchema110 aboutYourHealth =
-              (AboutYourHealthSchema110) application.getHealthDisabilityData().getData();
+          AboutYourHealthSchema120 aboutYourHealth =
+              (AboutYourHealthSchema120) application.getHealthDisabilityData().getData();
           assertThat(aboutYourHealth.getHealthProfessionalsDetails()).hasSize(2);
         });
   }
@@ -257,17 +294,17 @@ class RegistrationSubmitterTest {
         .build();
   }
 
-  private RegistrationSchema130 getRegistrationSchemaFixture() {
-    var registrationSchema = new RegistrationSchema130();
-    var personalDetails = new PersonalDetailsSchema110();
+  private RegistrationSchema140 getRegistrationSchemaFixture() {
+    var registrationSchema = new RegistrationSchema140();
+    var personalDetails = new PersonalDetailsSchema120();
     personalDetails.setFirstname("Azzzam");
     personalDetails.setSurname("Azzzle");
     personalDetails.setNino("RN000006A");
     registrationSchema.setPersonalDetails(personalDetails);
 
-    var aboutYourHealth = new AboutYourHealthSchema110();
-    var healthProfessionalsDetails1 = new HealthProfessionalsDetailsSchema100();
-    var healthProfessionalsDetails2 = new HealthProfessionalsDetailsSchema100();
+    var aboutYourHealth = new AboutYourHealthSchema120();
+    var healthProfessionalsDetails1 = new HealthProfessionalsDetailsSchema110();
+    var healthProfessionalsDetails2 = new HealthProfessionalsDetailsSchema110();
     aboutYourHealth.setHealthProfessionalsDetails(
         List.of(healthProfessionalsDetails1, healthProfessionalsDetails2));
     registrationSchema.setAboutYourHealth(aboutYourHealth);

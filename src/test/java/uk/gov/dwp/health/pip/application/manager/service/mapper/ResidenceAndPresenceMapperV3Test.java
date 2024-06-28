@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110;
 
 import java.io.IOException;
@@ -23,8 +23,8 @@ class ResidenceAndPresenceMapperV3Test {
   @BeforeEach
   void beforeEach() throws IOException {
     residenceAndPresenceMapperV3 = new ResidenceAndPresenceMapperV3();
-
-    RegistrationSchema130 registrationSchema =
+    
+    RegistrationSchema140 registrationSchema =
         getRegistrationDataFromFile("mapping/validRegistrationData.json");
 
     residenceAndPresence = registrationSchema.getResidenceAndPresence();

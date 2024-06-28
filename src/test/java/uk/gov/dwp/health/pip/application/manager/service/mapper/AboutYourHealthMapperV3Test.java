@@ -7,13 +7,14 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema130;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.HealthProfessionalDto;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static support.FileUtils.getNewRegistrationDataFromFile;
 import static support.FileUtils.getRegistrationDataFromFile;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -21,7 +22,7 @@ import static support.FileUtils.getRegistrationDataFromFile;
 class AboutYourHealthMapperV3Test {
 
   private AboutYourHealthMapperV3 aboutYourHealthMapperV3;
-  private RegistrationSchema130 registrationSchema;
+  private RegistrationSchema140 registrationSchema;
 
   @BeforeEach
   void beforeEach() {
@@ -34,7 +35,7 @@ class AboutYourHealthMapperV3Test {
 
     @BeforeEach
     void beforeEach() throws IOException {
-      registrationSchema = getRegistrationDataFromFile("mapping/validRegistrationData.json");
+      registrationSchema = getNewRegistrationDataFromFile("mapping/newValidRegistrationData.json");
     }
 
     @Test

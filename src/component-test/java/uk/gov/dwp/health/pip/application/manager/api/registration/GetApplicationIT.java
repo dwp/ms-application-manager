@@ -1,5 +1,9 @@
 package uk.gov.dwp.health.pip.application.manager.api.registration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetRegistrationUrl;
+import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,10 +14,6 @@ import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.requestmodels.registration.Registration;
 import uk.gov.dwp.health.pip.application.manager.responsemodels.Application;
 import uk.gov.dwp.health.pip.application.manager.utils.RandomStringUtil;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildGetRegistrationUrl;
-import static uk.gov.dwp.health.pip.application.manager.utils.UrlBuilderUtil.buildPostApplicationUrl;
 
 public class GetApplicationIT extends ApiTest {
   String url;
@@ -56,11 +56,13 @@ public class GetApplicationIT extends ApiTest {
     MongoTemplate mongoTemplate = MongoClientConnection.getMongoTemplate();
     var application1 =
         uk.gov.dwp.health.pip.application.manager.entity.Application.builder()
+            .id("5ed0d430716609122be7a4d1")
             .claimantId("300000000000000000000409")
             .state(State.builder().current(ApplicationState.REGISTRATION.name()).build())
             .build();
     var application2 =
         uk.gov.dwp.health.pip.application.manager.entity.Application.builder()
+            .id("5ed0d430716609122be7a4d2")
             .claimantId("300000000000000000000409")
             .state(State.builder().current(ApplicationState.REGISTRATION.name()).build())
             .build();

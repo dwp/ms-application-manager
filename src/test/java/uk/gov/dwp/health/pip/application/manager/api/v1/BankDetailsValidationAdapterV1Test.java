@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.dwp.health.pip.application.manager.entity.BankDetailsValidityList;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity;
 import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.dto.AccountDetails;
+import uk.gov.dwp.health.pip.application.manager.openapi.bankdetails.v1.dto.BankDetailsDto;
+import uk.gov.dwp.health.pip.application.manager.service.BankDetailsGetter;
 import uk.gov.dwp.health.pip.application.manager.service.BankDetailsValidator;
 
 import java.util.LinkedList;
@@ -33,6 +35,7 @@ class BankDetailsValidationAdapterV1Test {
 
   @InjectMocks private BankDetailsValidationAdapterV1 bankDetailsValidationAdapterV2;
   @Mock private BankDetailsValidator bankDetailsValidator;
+  @Mock private BankDetailsGetter bankDetailsGetter;
 
   @Test
   void validDetails() {
@@ -71,5 +74,17 @@ class BankDetailsValidationAdapterV1Test {
     assertThat(invalidResponseEntity.getBody().size()).isEqualTo(2);
     assertThat(invalidResponseEntity.getBody().get(0)).isEqualTo("INVALID_ACCOUNT_COMBINATION");
     assertThat(invalidResponseEntity.getBody().get(1)).isEqualTo("INVALID_ROLL_NUMBER");
+  }
+
+  @Test
+  void when_bank_details_exist_returns_200() {
+    BankDetailsDto bankDetailsDto = new BankDetailsDto();
+    when(bankDetailsGetter.getBankDetailsByApplicationId("application-id-1"))
+            .thenReturn(bankDetailsDto);
+
+    ResponseEntity<BankDetailsDto> response = bankDetailsValidationAdapterV2.getBankDetailsByApplicationId("application-id-1");
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isEqualTo(bankDetailsDto);
   }
 }

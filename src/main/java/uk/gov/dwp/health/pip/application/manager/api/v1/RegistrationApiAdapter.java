@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.V1Api;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
@@ -25,19 +25,21 @@ public class RegistrationApiAdapter implements V1Api {
 
   @Override
   public ResponseEntity<RegistrationDto> getRegistrationData(String claimantId) {
-    var registrationDto = registrationDataGetter.getRegistrationDataByClaimantId(claimantId);
+    RegistrationDto registrationDto =
+        registrationDataGetter.getRegistrationDataByClaimantId(claimantId);
     return ResponseEntity.status(HttpStatus.OK).body(registrationDto);
   }
 
   @Override
   public ResponseEntity<RegistrationDto> getRegistrationDataByApplicationId(String applicationId) {
-    var registrationDto = registrationDataGetter.getRegistrationDataByApplicationId(applicationId);
+    RegistrationDto registrationDto =
+        registrationDataGetter.getRegistrationDataByApplicationId(applicationId);
     return ResponseEntity.status(HttpStatus.OK).body(registrationDto);
   }
 
   @Override
   public ResponseEntity<Void> updateRegistrationData(
-      String applicationId, FormDataDto formDataDto) {
+          String applicationId, FormDataDto formDataDto) {
     registrationDataUpdater.updateRegistrationDataByApplicationId(applicationId, formDataDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
@@ -50,13 +52,16 @@ public class RegistrationApiAdapter implements V1Api {
 
   @Override
   public ResponseEntity<ApplicationStatusDto> getApplicationStatus(String claimantId) {
-    var status = applicationStatusGetter.getApplicationStatusByClaimantId(claimantId);
+    ApplicationStatusDto status =
+        applicationStatusGetter.getApplicationStatusByClaimantId(claimantId);
     return ResponseEntity.ok().body(status);
   }
 
   @Override
-  public ResponseEntity<ClaimantIdAndStatusDto> getClaimantIdAndStatus(String applicationId) {
-    var status = applicationStatusGetter.getClaimantIdAndStatus(applicationId);
+  public ResponseEntity<ClaimantIdAndApplicationStatus> getClaimantIdAndStatus(
+          String applicationId) {
+    ClaimantIdAndApplicationStatus status =
+        applicationStatusGetter.getClaimantIdAndStatus(applicationId);
     return ResponseEntity.ok().body(status);
   }
 }

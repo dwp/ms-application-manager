@@ -53,6 +53,7 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/pip-apply-application-mgr
       - SPRING_CONFIG_ACTIVE_PROFILE_ON=dev
       - PIP_APPLICATION_ACTIVE_DURATION=90
+      - PIP_COORDINATOR_BASE_URL=http://ms-pip-application-coordinator:8080
       - FEATURE_ENCRYPTION_DATA_ENABLED=true
       - FEATURE_ENCRYPTION_MESSAGING_ENABLED=false
       - FEATURE_DATA_CHANGESTREAM_ENABLED=true
@@ -117,7 +118,7 @@ services:
     volumes:
       - .:/usr/src
       - ${MVN_M2}:/root/.m2
-      - ${MVN_SETTINGS_FILE_SAAS}:/root/.m2/settings.xml
+      - ${MVN_SETTINGS_FILE}:/root/.m2/settings.xml
       - ./target/test/reports:/usr/src/target/test-reports
     networks:
       - test
@@ -129,6 +130,17 @@ services:
       - 8080
     ports:
       - "8950:8080"
+    command: --global-response-templating --verbose
+    networks:
+      - test
+
+  ms-pip-application-coordinator:
+    image: '${MOCK_IMAGE}'
+    container_name: ms-pip-application-coordinator
+    expose:
+      - 8080
+    ports:
+      - "9990:8080"
     command: --global-response-templating --verbose
     networks:
       - test
