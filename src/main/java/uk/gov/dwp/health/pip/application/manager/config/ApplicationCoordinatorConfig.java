@@ -1,7 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.config;
 
-import java.io.IOException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -19,6 +17,9 @@ import uk.gov.dwp.health.pip.application.manager.config.properties.ApplicationCo
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.ApiClient;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.DefaultMsCoordinatorClient;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j
 @Configuration
@@ -41,8 +42,8 @@ public class ApplicationCoordinatorConfig {
 
   private RestTemplate configureRestClient() {
     RestTemplate restTemplate = builder
-            .errorHandler(new ApplicationCoordinatorResponseErrorHandler())
-            .build();
+        .errorHandler(new ApplicationCoordinatorResponseErrorHandler())
+        .build();
     restTemplate.getMessageConverters().add(jacksonSupportsMoreTypes());
     return restTemplate;
   }
@@ -50,7 +51,7 @@ public class ApplicationCoordinatorConfig {
   private HttpMessageConverter jacksonSupportsMoreTypes() {
     MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
     converter.setSupportedMediaTypes(
-            Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
+        Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM));
     return converter;
   }
 
@@ -58,7 +59,7 @@ public class ApplicationCoordinatorConfig {
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
       return httpResponse.getStatusCode().is5xxServerError()
-              || httpResponse.getStatusCode().is4xxClientError();
+          || httpResponse.getStatusCode().is4xxClientError();
     }
 
     @Override
@@ -72,6 +73,5 @@ public class ApplicationCoordinatorConfig {
         }
       }
     }
-
   }
 }

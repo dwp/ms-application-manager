@@ -1,8 +1,5 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
-import java.time.Clock;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +12,10 @@ import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.Applica
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.HistoryDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.StateDto;
 
+import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +25,8 @@ public class ApplicationCoordinatorService {
   private final Clock clock;
 
   public State getApplicationState(String applicationId) {
-    ApplicationStateDto application = defaultMsCoordinatorClient.getApplication(applicationId);
+    ApplicationStateDto application = defaultMsCoordinatorClient.getApplication(
+        applicationId, null, null, null);
     log.info("Response received from post to ms-pip-application-coordinator");
     ApplicationState state =
         ApplicationState.valueOf(application.getState().getCurrentState().getValue());

@@ -11,4 +11,8 @@ public interface ApplicationRepository
     extends CrudRepository<Application, String>, ApplicationRepositoryCustom {
 
   List<Application> findAllByClaimantId(String claimantId);
+
+  List<Application> getAllByNino(String nino);
+
+  List<Application> getAllBySubmissionId(String submissionId);
 }

@@ -16,5 +16,5 @@ variables:
   CI_PROJECT_NAME: ms-application-manager
   PITEST_TARGET_CLASSES: "uk.gov.dwp.health.pip.application.manager.*"
   PITEST_TARGET_TEST_CLASSES: "uk.gov.dwp.health.pip.application.manager.*"
-  PITEST_EXCLUDED_TEST_CLASSES: "*.AppControllerAdviseTest,uk.gov.dwp.health.pip.application.manager.repository.*"
+  PITEST_EXCLUDED_TEST_CLASSES: "*.AppControllerAdviseTest,uk.gov.dwp.health.pip.application.manager.repository.*,uk.gov.dwp.health.pip.application.manager.service.RegistrationDataGetterV5Test.*"
   PITEST_EXCLUDED_CLASSES: "uk.gov.dwp.health.pip.application.manager.openapi.*"

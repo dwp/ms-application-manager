@@ -13,8 +13,4 @@
     <notes><![CDATA[file name: springfox-swagger-ui-3.0.0.jar]]></notes>
     <cve>CVE-2020-26870</cve>
   </suppress>
-  <suppress>
-    <notes><![CDATA[file name: classgraph-4.8.90.jar]]></notes>
-    <cve>CVE-2021-47621</cve>
-  </suppress>
 </suppressions>

@@ -13,7 +13,7 @@
 
     <groupId>uk.gov.dwp.health.pip</groupId>
     <artifactId>ms-application-manager</artifactId>
-    <version>2.14.0</version>
+    <version>2.15.0</version>
     <name>ms-pip-application-manager</name>
     <description>Strategic pip-apply micro service handle applicant application</description>
 
@@ -41,7 +41,7 @@
         <plugin.maven.compiler.version>3.11.0</plugin.maven.compiler.version>
         <plugin.spotbugs.version>4.7.3.0</plugin.spotbugs.version>
         <spotbugs.version>4.7.3</spotbugs.version>
-        <plugin.maven.owasp.version>9.2.0</plugin.maven.owasp.version>
+        <plugin.maven.owasp.version>10.0.2</plugin.maven.owasp.version>
         <plugin.maven.jacoco.version>0.8.8</plugin.maven.jacoco.version>
         <plugin.projectinfo.version>3.1.1</plugin.projectinfo.version>
         <plugin.surefire.version>3.0.0-M7</plugin.surefire.version>
@@ -72,6 +72,7 @@
         <spring-web.version>6.1.6</spring-web.version>
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <netty-codec-http.version>4.1.108.Final</netty-codec-http.version>
+        <classgraph.version>4.8.174</classgraph.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -261,6 +262,11 @@
             <artifactId>easy-random-core</artifactId>
             <version>${easy-random-core.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>${classgraph.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
@@ -525,6 +531,8 @@
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v3/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v4/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v5/dto/*</exclude>
+                        <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/registration/v5/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/dto/*</exclude>
                         <exclude>**uk/gov/dwp/health/pip/application/manager/openapi/coordinator/auth/*</exclude>
@@ -657,6 +665,35 @@
                             <generatorName>spring</generatorName>
                             <modelPackage>${client.base.package.name}.openapi.registration.v4.dto</modelPackage>
                             <apiPackage>${client.base.package.name}.openapi.registration.v4</apiPackage>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
+                            <configOptions>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <artifactVersion>${project.version}</artifactVersion>
+                                <bigDecimalAsString>true</bigDecimalAsString>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <java8>true</java8>
+                                <useBeanValidation>true</useBeanValidation>
+                                <delegatePattern>true</delegatePattern>
+                                <useJakartaEe>true</useJakartaEe>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-registration-api-v5</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>
+                                ${project.basedir}/schemas/api-spec/ms-application-manager/openapi-spec-registration-v5.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <modelPackage>${client.base.package.name}.openapi.registration.v5.dto</modelPackage>
+                            <apiPackage>${client.base.package.name}.openapi.registration.v5</apiPackage>
                             <generateSupportingFiles>true</generateSupportingFiles>
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
@@ -893,6 +930,7 @@
                     <excludedTestClasses>
                         <class>*.AppControllerAdviseTest</class>
                         <class>uk.gov.dwp.health.pip.application.manager.repository.*</class>
+                        <class>*.RegistrationDataGetterV5Test</class>
                     </excludedTestClasses>
                 </configuration>
             </plugin>
