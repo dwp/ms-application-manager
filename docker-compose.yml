@@ -94,6 +94,11 @@ services:
       - LOGGING_LEVEL_UK_GOV_DWP_HEALTH_MONGO_CHANGESTREAM_COMPONENT=INFO
     networks:
       - test
+    entrypoint:
+      - java
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009
+      - -jar
+      - /ms-application-manager.jar
 
   api-test:
     container_name: api-test

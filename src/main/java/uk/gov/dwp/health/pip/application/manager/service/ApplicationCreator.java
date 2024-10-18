@@ -48,7 +48,8 @@ public class ApplicationCreator {
 
     log.info("Created new application");
 
-    applicationCoordinatorService.postApplicationId(savedApplication.getId());
+    applicationCoordinatorService.postApplicationId(
+        savedApplication.getId(), savedApplication.getClaimantId());
 
     return applicationDto;
   }

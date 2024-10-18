@@ -38,7 +38,8 @@ public class RegistrationDataGetterV3 {
       registrationDto.setStateDto(stateDtoMapperV3.toDto(getRegistrationState));
       log.info("Got registration data for application {}", applicationId);
       return registrationDto;
-    } catch (ApplicationNotFoundException exc) {
+    } catch (Exception exc) {
+      log.info("Exception mapping of state from coordinator {}", exc.getMessage());
       return registrationDto;
     }
   }

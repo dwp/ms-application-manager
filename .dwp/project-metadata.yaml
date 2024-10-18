@@ -3,10 +3,10 @@ schema_version: 1.0.0
 project:
   - project_id: 28972556
     component_name: ms-application-manager
-    version: 2.15.0
+    version: 2.19.3
     last_verified:
-      date: "2024-07-09"
-      name: "@steven.parker"
+      date: "2024-10-18"
+      name: "@kevin.monteiro"
     tags:
       payments: false
       personally_identifying_information: true

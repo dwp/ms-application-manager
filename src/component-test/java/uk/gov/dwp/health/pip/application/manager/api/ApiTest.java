@@ -7,7 +7,11 @@ import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.aspectj.lang.annotation.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import uk.gov.dwp.health.pip.application.manager.config.MongoClientConnection;
 
 import static io.restassured.RestAssured.given;
 
@@ -26,6 +30,11 @@ public class ApiTest {
             .addFilter(new AllureRestAssured())
             .addHeader("X-Correlation-Id", "aea45fc6-9ace-4fd9-b9a4-f78cdf1126a7")
             .build();
+  }
+
+  @AfterEach
+  void init(){
+    MongoClientConnection.emptyMongoCollection();
   }
 
   protected <T> T extractPostRequest(String path, Object bodyPayload, Class<T> responseClass) {

@@ -23,15 +23,15 @@ public class StateDtoMapperV3 {
 
   private List<HistoryDto> getHistory(List<History> history) {
     List<HistoryDto> historyList = new ArrayList<>();
+    if (history != null) {
+      history.forEach(his -> {
+        var historyDto = new HistoryDto()
+            .state(StateEnum.valueOf(his.getState()))
+            .timestamp(his.getTimeStamp().toString());
 
-    history.forEach(his -> {
-      var historyDto = new HistoryDto()
-          .state(StateEnum.valueOf(his.getState()))
-          .timestamp(his.getTimeStamp().toString());
-
-      historyList.add(historyDto);
-    });
-
+        historyList.add(historyDto);
+      });
+    }
     return historyList;
   }
 }

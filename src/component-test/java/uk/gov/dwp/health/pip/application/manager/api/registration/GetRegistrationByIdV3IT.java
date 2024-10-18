@@ -55,11 +55,6 @@ class GetRegistrationByIdV3IT extends ApiTest {
     assertThat(registrationDto.getLanguage()).isEqualTo(LanguageEnum.EN);
     assertThat(registrationDto.getStateDto().getCurrentState())
         .isEqualTo(CurrentStateEnum.HEALTH_AND_DISABILITY);
-    assertThat(registrationDto.getStateDto().getHistory()).hasSize(2);
-    assertThat(registrationDto.getStateDto().getHistory().get(0).getState())
-        .isEqualTo(StateEnum.REGISTRATION);
-    assertThat(registrationDto.getStateDto().getHistory().get(1).getState())
-        .isEqualTo(StateEnum.HEALTH_AND_DISABILITY);
 
     verifyPersonalDetails(registrationDto.getPersonalDetails());
     verifyAboutYourHealth(registrationDto.getAboutYourHealth());

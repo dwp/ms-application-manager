@@ -40,7 +40,7 @@ class BankDetailsValidationAdapterV2Test {
     void validDetails() {
         final BankDetailsValidityList result = new BankDetailsValidityList();
         result.addResult(BankDetailsValidity.VALID);
-        when(bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID)).thenReturn(result);
+        when(bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID)).thenReturn(result);
 
         final AccountDetails account = new AccountDetails();
         account.setAccountNumber(ACCOUNT_NUMBER);
@@ -60,7 +60,7 @@ class BankDetailsValidationAdapterV2Test {
         final BankDetailsValidityList invalidAccountResult = new BankDetailsValidityList();
         invalidAccountResult.addResult(BankDetailsValidity.INVALID_ACCOUNT_COMBINATION);
         invalidAccountResult.addResult(BankDetailsValidity.INVALID_ROLL_NUMBER);
-        when(bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID))
+        when(bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID))
                 .thenReturn(invalidAccountResult);
 
         final AccountDetails invalidAccount = new AccountDetails();

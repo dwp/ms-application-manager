@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.V1Api;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationCoordinatorStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
@@ -39,7 +39,7 @@ public class RegistrationApiAdapter implements V1Api {
 
   @Override
   public ResponseEntity<Void> updateRegistrationData(
-          String applicationId, FormDataDto formDataDto) {
+      String applicationId, FormDataDto formDataDto) {
     registrationDataUpdater.updateRegistrationDataByApplicationId(applicationId, formDataDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
@@ -51,15 +51,15 @@ public class RegistrationApiAdapter implements V1Api {
   }
 
   @Override
-  public ResponseEntity<ApplicationStatusDto> getApplicationStatus(String claimantId) {
-    ApplicationStatusDto status =
+  public ResponseEntity<ApplicationCoordinatorStatusDto> getApplicationStatus(String claimantId) {
+    ApplicationCoordinatorStatusDto status =
         applicationStatusGetter.getApplicationStatusByClaimantId(claimantId);
     return ResponseEntity.ok().body(status);
   }
 
   @Override
   public ResponseEntity<ClaimantIdAndApplicationStatus> getClaimantIdAndStatus(
-          String applicationId) {
+      String applicationId) {
     ClaimantIdAndApplicationStatus status =
         applicationStatusGetter.getClaimantIdAndStatus(applicationId);
     return ResponseEntity.ok().body(status);

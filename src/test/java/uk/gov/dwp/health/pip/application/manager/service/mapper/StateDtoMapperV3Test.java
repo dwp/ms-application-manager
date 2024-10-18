@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +52,21 @@ public class StateDtoMapperV3Test {
       var history = stateDto.getHistory().get(0);
       assertThat(history.getState()).isEqualTo(StateEnum.HEALTH_AND_DISABILITY);
       assertThat(history.getTimestamp()).isEqualTo(instant.toString());
+    }
+    @Test
+    void when_unknown_state() {
+      var instant = Instant.now();
+      var stateHistory = new History();
+      stateHistory.setState("HEALTH_AND_DISABILITY");
+      stateHistory.setTimeStamp(instant);
+
+      var stateDetails = new State();
+      stateDetails.setCurrent("SOMETHING_ELSE");
+      stateDetails.setHistory(List.of(stateHistory));
+
+      assertThatThrownBy(() -> stateDtoMapperV3.toDto(stateDetails))
+              .isInstanceOf(IllegalArgumentException.class);
+
     }
   }
 }

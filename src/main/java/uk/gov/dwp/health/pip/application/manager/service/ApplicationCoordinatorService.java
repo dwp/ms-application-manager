@@ -4,16 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
-import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.DefaultMsCoordinatorClient;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ActiveApplicationsDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationStateDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.HistoryDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationCoordinatorDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.StateDto;
 
 import java.time.Clock;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,15 +22,23 @@ public class ApplicationCoordinatorService {
   private final Clock clock;
 
   public State getApplicationState(String applicationId) {
-    ApplicationStateDto application = defaultMsCoordinatorClient.getApplication(
+    ApplicationCoordinatorDto application = defaultMsCoordinatorClient.getApplication(
         applicationId, null, null, null);
     log.info("Response received from post to ms-pip-application-coordinator");
+    return getApplicationState(application);
+  }
+
+  public State getApplicationState(ApplicationCoordinatorDto application) {
     ApplicationState state =
         ApplicationState.valueOf(application.getState().getCurrentState().getValue());
     return State.builder()
         .current(state.name())
-        .history(fromHistoryDtoToHistoryList(application.getHistory()))
         .build();
+  }
+
+  public ApplicationCoordinatorDto getApplicationCoordinatorDto(String applicationId) {
+    return defaultMsCoordinatorClient.getApplication(
+        applicationId, null, null, null);
   }
 
   public Boolean hasActiveApplications(List<String> applications) {
@@ -78,36 +83,34 @@ public class ApplicationCoordinatorService {
     }
   }
 
-  public State postApplicationId(String applicationId) {
+  public State postApplicationId(String applicationId, String claimantId) {
     log.info(
         "About to make post to create application in ms-pip-application-coordinator for {}",
         applicationId);
-    ApplicationStateDto applicationStateDto =
-        defaultMsCoordinatorClient.createApplication(applicationId);
+
+    ApplicationCoordinatorDto dto = new ApplicationCoordinatorDto();
+    dto.setApplicationId(applicationId);
+    dto.setClaimantId(claimantId);
+
+    ApplicationCoordinatorDto applicationCoordinatorDto =
+        defaultMsCoordinatorClient.createApplication(dto);
+
     log.info("Response received from post to ms-pip-application-coordinator");
+
     ApplicationState state =
-        ApplicationState.valueOf(applicationStateDto.getState().getCurrentState().getValue());
+        ApplicationState.valueOf(applicationCoordinatorDto.getState().getCurrentState().getValue());
+
     return State.builder()
         .current(state.name())
-        .history(fromHistoryDtoToHistoryList(applicationStateDto.getHistory()))
         .build();
   }
 
   public void updateState(String applicationId, StateDto.CurrentStateEnum state) {
-    ApplicationStateDto applicationStateDto =
-        new ApplicationStateDto()
+    ApplicationCoordinatorDto applicationCoordinatorDto =
+        new ApplicationCoordinatorDto()
             .applicationId(applicationId)
             .state(new StateDto().currentState(state));
-    defaultMsCoordinatorClient.updateApplication(applicationStateDto);
+    defaultMsCoordinatorClient.updateApplication(applicationCoordinatorDto);
     log.info("Response received from post to ms-pip-application-coordinator");
-  }
-
-  private List<History> fromHistoryDtoToHistoryList(List<HistoryDto> historyDto) {
-    List<History> historyList = new ArrayList<>(historyDto.size());
-    for (HistoryDto dto : historyDto) {
-      History history = new History(dto.getState().getValue(), clock.instant()); // change
-      historyList.add(history);
-    }
-    return historyList;
   }
 }

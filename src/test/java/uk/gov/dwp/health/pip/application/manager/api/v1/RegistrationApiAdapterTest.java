@@ -1,5 +1,13 @@
 package uk.gov.dwp.health.pip.application.manager.api.v1;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Objects;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
@@ -10,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationCoordinatorStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
@@ -18,15 +26,6 @@ import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationDataGetter;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationDataUpdater;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationSubmitter;
-
-import java.util.Objects;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -109,8 +108,9 @@ class RegistrationApiAdapterTest {
   @Test
   void should_return_application_status_application_status_getter_invoked() {
     var claimantId = UUID.randomUUID().toString();
-    var applicationDto = new ApplicationStatusDto();
-    applicationDto.setApplicationStatus(ApplicationStatusDto.ApplicationStatusEnum.REGISTRATION);
+    var applicationDto = new ApplicationCoordinatorStatusDto();
+    applicationDto.setApplicationStatus(
+        ApplicationCoordinatorStatusDto.ApplicationStatusEnum.REGISTRATION);
     when(applicationStatusGetter.getApplicationStatusByClaimantId(anyString()))
         .thenReturn(applicationDto);
     var actual = registrationApiAdapter.getApplicationStatus(claimantId);
@@ -133,20 +133,21 @@ class RegistrationApiAdapterTest {
   void should_return_application_status_and_claimant_id_when_getter_invoked() {
     var applicationId = UUID.randomUUID().toString();
     var claimantIdAndStatusDto = new ClaimantIdAndApplicationStatus();
-    claimantIdAndStatusDto.setApplicationStatus(ClaimantIdAndApplicationStatus.ApplicationStatusEnum.REGISTRATION);
+    claimantIdAndStatusDto.setApplicationStatus(
+        ClaimantIdAndApplicationStatus.ApplicationStatusEnum.REGISTRATION);
     when(applicationStatusGetter.getClaimantIdAndStatus(anyString()))
-            .thenReturn(claimantIdAndStatusDto);
+        .thenReturn(claimantIdAndStatusDto);
     var actual = registrationApiAdapter.getClaimantIdAndStatus(applicationId);
 
     assertAll(
-            "assert application status response to be 200 and body with current status",
-            () -> {
-              var httpStatus = actual.getStatusCode();
-              assertThat(httpStatus).isEqualTo(HttpStatus.OK);
-              var applicationStatus =
-                      Objects.requireNonNull(actual.getBody()).getApplicationStatus().getValue();
-              assertThat(applicationStatus).isEqualTo("REGISTRATION");
-            });
+        "assert application status response to be 200 and body with current status",
+        () -> {
+          var httpStatus = actual.getStatusCode();
+          assertThat(httpStatus).isEqualTo(HttpStatus.OK);
+          var applicationStatus =
+              Objects.requireNonNull(actual.getBody()).getApplicationStatus().getValue();
+          assertThat(applicationStatus).isEqualTo("REGISTRATION");
+        });
     var strCaptor = ArgumentCaptor.forClass(String.class);
     verify(applicationStatusGetter).getClaimantIdAndStatus(strCaptor.capture());
     assertThat(strCaptor.getValue()).isEqualTo(applicationId);

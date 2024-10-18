@@ -53,13 +53,11 @@ public class BankDetailsValidator {
     final BankDetailsValidityList result = new BankDetailsValidityList();
     try {
       final String consumerId = properties.getConsumerId();
-      // set by dwp-meta-data-logger library intercepting incoming request
-      final Object dwpCorrelationId = MDC.get("correlationId");
-      final String correlationId = dwpCorrelationId == null
-          ? UUID.randomUUID().toString()
-          : dwpCorrelationId.toString();
+      final UUID bankWizardCorrelationId = UUID.randomUUID();
+      log.info("setting correlation id to {}", bankWizardCorrelationId);
+
       final ValidationResultDto validationResultDto = api.validate1(
-          correlationId, consumerId, accountDetails
+          bankWizardCorrelationId.toString(), consumerId, accountDetails
       );
       if (validationResultDto == null || validationResultDto.isValidDetails() == null) {
         log.warn("Unexpected response from bank wizard {}", validationResultDto);

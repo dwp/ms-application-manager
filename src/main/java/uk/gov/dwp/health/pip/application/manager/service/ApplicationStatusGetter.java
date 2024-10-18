@@ -1,21 +1,22 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationCoordinatorDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationCoordinatorStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.ClaimantIdAndStatusDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v2.dto.HistoryDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -26,7 +27,27 @@ public class ApplicationStatusGetter {
   private final RegistrationDataMarshaller registrationDataMarshaller;
   private final ApplicationCoordinatorService applicationCoordinatorService;
 
-  public ApplicationStatusDto getApplicationStatusByClaimantId(String claimantId) {
+  @NotNull
+  private static ClaimantIdAndStatusDto toClaimantIdAndStatusDto(Application application) {
+    ClaimantIdAndStatusDto claimantIdAndStatusDto = new ClaimantIdAndStatusDto();
+    claimantIdAndStatusDto.setClaimantId(application.getClaimantId());
+
+    claimantIdAndStatusDto.setCurrentState(
+        ClaimantIdAndStatusDto.CurrentStateEnum.fromValue(application.getState().getCurrent()));
+
+    claimantIdAndStatusDto.setHistory(
+        application.getState().getHistory().stream()
+            .map(
+                (history ->
+                    new HistoryDto()
+                        .state(HistoryDto.StateEnum.fromValue(history.getState()))
+                        .timestamp(history.getTimeStamp().toString())))
+            .toList());
+
+    return claimantIdAndStatusDto;
+  }
+
+  public ApplicationCoordinatorStatusDto getApplicationStatusByClaimantId(String claimantId) {
     List<Application> applications = applicationRepository.findAllByClaimantId(claimantId);
     if (applications.isEmpty()) {
       throw new ApplicationNotFoundException(
@@ -68,35 +89,19 @@ public class ApplicationStatusGetter {
     return toClaimantIdAndStatusDto(application.get());
   }
 
-  @NotNull
-  private static ClaimantIdAndStatusDto toClaimantIdAndStatusDto(Application application) {
-    ClaimantIdAndStatusDto claimantIdAndStatusDto = new ClaimantIdAndStatusDto();
-    claimantIdAndStatusDto.setClaimantId(application.getClaimantId());
-
-    claimantIdAndStatusDto.setCurrentState(
-        ClaimantIdAndStatusDto.CurrentStateEnum.fromValue(application.getState().getCurrent()));
-
-    claimantIdAndStatusDto.setHistory(
-        application.getState().getHistory().stream()
-            .map(
-                (history ->
-                    new HistoryDto()
-                        .state(HistoryDto.StateEnum.fromValue(history.getState()))
-                        .timestamp(history.getTimeStamp().toString())))
-            .toList());
-
-    return claimantIdAndStatusDto;
-  }
-
-  private ApplicationStatusDto toDto(Application application) {
+  private ApplicationCoordinatorStatusDto toDto(Application application) {
+    ApplicationCoordinatorDto dto = applicationCoordinatorService
+        .getApplicationCoordinatorDto(application.getId());
     String currentApplicationState =
-        applicationCoordinatorService.getApplicationState(application.getId()).getCurrent();
+        applicationCoordinatorService.getApplicationState(dto).getCurrent();
 
-    var applicationStatusDto = new ApplicationStatusDto();
+    var applicationStatusDto = new ApplicationCoordinatorStatusDto();
     applicationStatusDto.applicationId(application.getId());
-    applicationStatusDto.submissionId(application.getSubmissionId());
+    applicationStatusDto.submissionId(StringUtils.hasLength(dto.getSubmissionId())
+        ? dto.getSubmissionId()
+        : application.getSubmissionId());
     applicationStatusDto.setApplicationStatus(
-        ApplicationStatusDto.ApplicationStatusEnum.fromValue(currentApplicationState));
+        ApplicationCoordinatorStatusDto.ApplicationStatusEnum.fromValue(currentApplicationState));
 
     if (ApplicationState.valueOf(currentApplicationState).getValue()
         > ApplicationState.REGISTRATION.getValue()) {

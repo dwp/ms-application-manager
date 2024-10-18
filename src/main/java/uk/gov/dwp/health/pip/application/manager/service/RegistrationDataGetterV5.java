@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v5.dto.HistoryDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v5.dto.V5ApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 public class RegistrationDataGetterV5 {
 
   private final ApplicationRepository repository;
+  private final RegistrationDataMarshaller registrationDataMarshaller;
 
   public V5ApplicationStatus getRegistrationDataById(
       String applicationId, String claimantId, String nino, String submissionId) {
@@ -54,7 +56,9 @@ public class RegistrationDataGetterV5 {
     return new V5ApplicationStatus()
         .applicationId(application.getId())
         .claimantId(application.getClaimantId())
-        .nino(application.getNino())
+        .nino(application.getNino() != null
+            ? application.getNino()
+            : getNinoFromPersonalDetails(application))
         .submissionId(application.getSubmissionId())
         .currentState(application.getState() != null && application.getState().getCurrent() != null
             ? V5ApplicationStatus.CurrentStateEnum.valueOf(application.getState().getCurrent())
@@ -82,5 +86,14 @@ public class RegistrationDataGetterV5 {
       throw new ConstraintViolationException("One and only one of application_id, "
           + "claimant_id, nino or submission_id required", Collections.EMPTY_SET);
     }
+  }
+
+  private String getNinoFromPersonalDetails(Application application) {
+    if (application.getRegistrationData().getData() != null) {
+      RegistrationSchema140 registrationSchema = registrationDataMarshaller
+          .marshallRegistrationData(application.getRegistrationData().getData());
+      return registrationSchema.getPersonalDetails().getNino();
+    }
+    return null;
   }
 }

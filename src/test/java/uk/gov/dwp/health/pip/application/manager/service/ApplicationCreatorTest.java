@@ -27,7 +27,7 @@ import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
-import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationStateDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationCoordinatorDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationCreateDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
@@ -62,9 +62,10 @@ class ApplicationCreatorTest {
         .thenReturn(
             Application.builder()
                 .id("application-id")
+                .claimantId("claimant-id")
                 .state(State.builder().current("REGISTRATION").build())
                 .build());
-    when(applicationCoordinatorService.postApplicationId("application-id"))
+    when(applicationCoordinatorService.postApplicationId("application-id", "claimant-id"))
         .thenReturn(State.builder().build());
 
     ApplicationDto applicationDto = applicationCreator.createApplication(applicationCreateDto);

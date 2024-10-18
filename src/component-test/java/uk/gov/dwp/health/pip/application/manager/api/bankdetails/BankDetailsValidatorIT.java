@@ -23,7 +23,6 @@ public class BankDetailsValidatorIT extends ApiTest {
   public static final String ACCOUNT_NUMBER = "12341234";
   public static final String SORT_CODE = "123123";
   public static final String ROLL_NUMBER = "32233223322332";
-  public static final String CORRELATION_ID = "43322334455443";
   public static final String CONSUMER_ID = "5";
 
   @Test

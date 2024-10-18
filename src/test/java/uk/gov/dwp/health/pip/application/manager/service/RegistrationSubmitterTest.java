@@ -142,7 +142,7 @@ class RegistrationSubmitterTest {
     when(repository.findById(APPLICATION_ID))
             .thenReturn(Optional.of(application));
     when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
-            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
+            .thenReturn(State.builder().current("REGISTRATION").build());
     when(registrationDataMarshaller.marshallRegistrationData(any()))
             .thenThrow(RegistrationDataNotValid.class);
 
@@ -172,7 +172,7 @@ class RegistrationSubmitterTest {
     when(clock.instant())
             .thenReturn(NOW);
     when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
-            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
+            .thenReturn(State.builder().current("REGISTRATION").build());
 
     Channel channel = new Channel();
     channel.setCollection("application");
@@ -211,7 +211,7 @@ class RegistrationSubmitterTest {
     when(clock.instant())
             .thenReturn(NOW);
     when(applicationCoordinatorService.getApplicationState(APPLICATION_ID))
-            .thenReturn(State.builder().current("HEALTH_AND_DISABILITY").build());
+            .thenReturn(State.builder().current("REGISTRATION").build());
 
     registrationSubmitter.submitRegistrationData(APPLICATION_ID);
 

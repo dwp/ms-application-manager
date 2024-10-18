@@ -2,9 +2,9 @@ package uk.gov.dwp.health.pip.application.manager.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -26,7 +26,8 @@ import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundEx
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.AddressSchema100;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
 import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationStatusDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationCoordinatorDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationCoordinatorStatusDto;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -65,13 +66,16 @@ class ApplicationStatusGetterTest {
 
     when(repository.findAllByClaimantId("claimant-id-1"))
         .thenReturn(Collections.singletonList(application));
-    when(applicationCoordinatorService.getApplicationState(applicationId))
+    when(applicationCoordinatorService.getApplicationState(any(ApplicationCoordinatorDto.class)))
         .thenReturn(state);
+    when(applicationCoordinatorService.getApplicationCoordinatorDto(applicationId))
+        .thenReturn(mock(ApplicationCoordinatorDto.class));
 
-    ApplicationStatusDto applicationStatusDto =
+    ApplicationCoordinatorStatusDto applicationStatusDto =
         applicationStatusGetter.getApplicationStatusByClaimantId("claimant-id-1");
 
-    assertThat(applicationStatusDto.getApplicationStatus().getValue()).isEqualTo(state.getCurrent());
+    assertThat(applicationStatusDto.getApplicationStatus().getValue())
+        .isEqualTo(state.getCurrent());
     assertThat(applicationStatusDto.getApplicationId()).isEqualTo(applicationId);
     assertThat(applicationStatusDto.getSubmissionId()).isNull();
     assertThat(applicationStatusDto.getSurname()).isNull();
@@ -98,8 +102,11 @@ class ApplicationStatusGetterTest {
         .thenReturn(Collections.singletonList(application));
     when(registrationDataMarshaller.marshallRegistrationData("registration-data"))
         .thenReturn(getRegistrationSchemaFixture());
-    when(applicationCoordinatorService.getApplicationState(applicationId)).thenReturn(state);
-    ApplicationStatusDto applicationStatusDto =
+    when(applicationCoordinatorService.getApplicationCoordinatorDto(applicationId))
+        .thenReturn(mock(ApplicationCoordinatorDto.class));
+    when(applicationCoordinatorService.getApplicationState(any(ApplicationCoordinatorDto.class)))
+        .thenReturn(state);
+    ApplicationCoordinatorStatusDto applicationStatusDto =
         applicationStatusGetter.getApplicationStatusByClaimantId("claimant-id-1");
 
     assertThat(applicationStatusDto.getApplicationStatus().getValue())
@@ -124,10 +131,13 @@ class ApplicationStatusGetterTest {
             .id(applicationId)
             .state(state)
             .registrationData(FormData.builder().data("registration-data").build())
-            .submissionId("submission-id-1")
             .build();
 
-    when(applicationCoordinatorService.getApplicationState(applicationId)).thenReturn(state);
+    ApplicationCoordinatorDto dto = new ApplicationCoordinatorDto()
+        .applicationId(applicationId).submissionId("submission-id-1");
+    when(applicationCoordinatorService.getApplicationState(any(ApplicationCoordinatorDto.class)))
+        .thenReturn(state);
+    when(applicationCoordinatorService.getApplicationCoordinatorDto(applicationId)).thenReturn(dto);
     when(repository.findAllByClaimantId(anyString()))
         .thenReturn(Collections.singletonList(application));
     when(registrationDataMarshaller.marshallRegistrationData("registration-data"))

@@ -15,6 +15,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.IGNORE;
 import static uk.gov.dwp.health.pip.application.manager.entity.enums.BankDetailsValidity.INVALID_ACCOUNT_COMBINATION;
@@ -43,23 +44,24 @@ public class BankDetailsValidatorV2 {
       final String accountNumber,
       final String sortCode,
       final String rollNumber,
-      final String consumerId,
-      final String correlationId) {
+      final String consumerId) {
     final AccountDetails accountDetails = new AccountDetails();
     accountDetails.setAccountNumber(accountNumber);
     accountDetails.setSortCode(sortCode);
     accountDetails.setRollNumber(rollNumber);
     final BankDetailsValidityList result = new BankDetailsValidityList();
     try {
+      final UUID bankWizardCorrelationId = UUID.randomUUID();
+      log.info("setting correlation id to {}", bankWizardCorrelationId);
       final ValidationResultDto validationResultDto = api.validate1(
-          correlationId, consumerId, accountDetails);
+          bankWizardCorrelationId.toString(), consumerId, accountDetails);
       if (validationResultDto == null || validationResultDto.isValidDetails() == null) {
         log.warn("Unexpected response from bank wizard {}", validationResultDto);
         result.addResult(SERVICE_DOWN);
       } else {
         final List<AdditionalInformationDto> dtos = validationResultDto.getAdditionalInformation();
         for (final AdditionalInformationDto additionalInformationDto : dtos) {
-          final AdditionalInformationDto.SeverityEnum severity = 
+          final AdditionalInformationDto.SeverityEnum severity =
               additionalInformationDto.getSeverity();
           final String code = additionalInformationDto.getCode();
           addResult(result, severity, code);
@@ -85,7 +87,7 @@ public class BankDetailsValidatorV2 {
   }
 
   private void addResult(
-      final BankDetailsValidityList result, 
+      final BankDetailsValidityList result,
       final AdditionalInformationDto.SeverityEnum severity,
       final String code
   ) {

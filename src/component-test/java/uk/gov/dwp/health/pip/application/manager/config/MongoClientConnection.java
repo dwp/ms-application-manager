@@ -5,6 +5,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 
 public class MongoClientConnection {
 
@@ -29,5 +30,9 @@ public class MongoClientConnection {
   private static String getEnv(String name, String defaultValue) {
     String env = System.getenv(name);
     return env == null ? defaultValue : env;
+  }
+
+  public static void emptyMongoCollection() {
+    getMongoTemplate().remove(new Query(), "application");
   }
 }

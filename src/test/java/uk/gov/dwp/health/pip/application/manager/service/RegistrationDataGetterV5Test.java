@@ -5,18 +5,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
+import uk.gov.dwp.health.pip.application.manager.entity.FormData;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v5.dto.V5ApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.repository.ApplicationRepository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @DataMongoTest
 @DisplayName("RegistrationDataGetterV5  tests")
@@ -27,16 +30,23 @@ class RegistrationDataGetterV5Test {
   ApplicationRepository applicationRepository;
 
   private static String applicationId;
+
+  private String noNinoApplicationId;
+
   private static final String CLAIMANT_ID = "111122223333444455556666";
   private static final String NINO = "AA112233A";
   private static final String SUBMISSION_ID = "666655554444333322221111";
 
   RegistrationDataGetterV5 registrationDataGetterV5;
 
+  @Mock
+  RegistrationDataMarshaller registrationDataMarshaller;
+
   @BeforeEach
   void init() {
     applicationRepository.deleteAll();
-    registrationDataGetterV5 = new RegistrationDataGetterV5(applicationRepository);
+    registrationDataGetterV5 = new RegistrationDataGetterV5(applicationRepository,
+        registrationDataMarshaller);
   }
 
   @DisplayName("Successful lookup using the application id")
@@ -50,6 +60,24 @@ class RegistrationDataGetterV5Test {
     assertThat(result.getSubmissionId()).isEqualTo(SUBMISSION_ID);
     assertThat(result.getClaimantId()).isEqualTo(CLAIMANT_ID);
     assertThat(result.getNino()).isEqualTo(NINO);
+    verify(applicationRepository, times(1)).findById(any());
+  }
+
+  @DisplayName("Successful lookup using the application id and nino from personal details")
+  @Test
+  void successfulApplicationIdNinoTest() {
+    loadSomeData();
+    RegistrationSchema140 schema = new RegistrationSchema140();
+    PersonalDetailsSchema120 personalDetails = new PersonalDetailsSchema120();
+    String nino = "AA112233A";
+    personalDetails.setNino(nino);
+    schema.setPersonalDetails(personalDetails);
+    doReturn(schema).when(registrationDataMarshaller)
+        .marshallRegistrationData(any());
+    V5ApplicationStatus result = registrationDataGetterV5.getRegistrationDataById(
+        noNinoApplicationId, null, null, null);
+    assertThat(result).isNotNull();
+    assertThat(result.getNino()).isEqualTo(nino);
     verify(applicationRepository, times(1)).findById(any());
   }
 
@@ -152,7 +180,7 @@ class RegistrationDataGetterV5Test {
     loadSomeData();
     loadSomeData();
     assertThrows(IllegalStateException.class, () -> registrationDataGetterV5
-        .getRegistrationDataById( null, null, null, SUBMISSION_ID
+        .getRegistrationDataById(null, null, null, SUBMISSION_ID
         )
     );
   }
@@ -175,10 +203,15 @@ class RegistrationDataGetterV5Test {
         .submissionId(SUBMISSION_ID)
         .build());
     applicationId = application.getId();
+    Application noNinoApplication = applicationRepository.save(Application.builder()
+        .claimantId(RandomStringUtils.randomAlphabetic(24).toLowerCase())
+        .registrationData(FormData.builder().data("{some data}").build())
+        .build());
+    noNinoApplicationId = noNinoApplication.getId();
     for (int i = 0; i < 10; i++) {
       applicationRepository.save(Application.builder()
           .claimantId(RandomStringUtils.randomAlphabetic(24).toLowerCase())
-          .nino("AA1122334" + i + "A")
+          .nino("AA12233" + i + "A")
           .submissionId(RandomStringUtils.randomAlphabetic(24).toLowerCase())
           .build());
     }

@@ -156,7 +156,7 @@ public class RegistrationSubmitter {
         applicationCoordinatorService.getApplicationState(application.getId());
 
     if (ApplicationState.valueOf(currentApplicationState.getCurrent()).getValue()
-            == ApplicationState.SUBMITTED.getValue()
+            >= ApplicationState.HEALTH_AND_DISABILITY.getValue()
         || application.getRegistrationData().getData() == null) {
       throw new ProhibitedActionException(
           "Registration data submission is not allowed after application submitted");

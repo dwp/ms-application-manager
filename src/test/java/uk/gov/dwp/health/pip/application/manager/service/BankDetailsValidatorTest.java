@@ -35,7 +35,6 @@ class BankDetailsValidatorTest {
   public static final String ACCOUNT_NUMBER = "1";
   public static final String SORT_CODE = "2";
   public static final String ROLL_NUMBER = "3";
-  public static final String CORRELATION_ID = "4";
   public static final String CONSUMER_ID = "5";
 
   @InjectMocks
@@ -45,14 +44,8 @@ class BankDetailsValidatorTest {
   @Mock
   private DefaultApi defaultApi;
 
-  @AfterEach
-  public void teardown() {
-    MDC.remove("correlationId");
-  }
-
   @Test
   public void validate() throws ApiException {
-    MDC.put("correlationId", CORRELATION_ID);
     when(properties.getConsumerId()).thenReturn(CONSUMER_ID);
     bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER);
     final ArgumentCaptor<AccountDetails> accountDetails = ArgumentCaptor.forClass(AccountDetails.class);
@@ -62,7 +55,6 @@ class BankDetailsValidatorTest {
     assertEquals(ACCOUNT_NUMBER, accountDetails.getValue().getAccountNumber());
     assertEquals(SORT_CODE, accountDetails.getValue().getSortCode());
     assertEquals(ROLL_NUMBER, accountDetails.getValue().getRollNumber());
-    assertEquals(CORRELATION_ID, correlationIdCaptor.getValue());
     assertEquals(CONSUMER_ID, consumerIdCaptor.getValue());
   }
 

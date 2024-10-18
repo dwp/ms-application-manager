@@ -1,5 +1,13 @@
 package uk.gov.dwp.health.pip.application.manager.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Tag;
@@ -12,18 +20,8 @@ import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.exception.ApplicationNotFoundException;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.DefaultMsCoordinatorClient;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ActiveApplicationsDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationStateDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.HistoryDto;
+import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.ApplicationCoordinatorDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.coordinator.dto.StateDto;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
@@ -32,38 +30,36 @@ class ApplicationCoordinatorServiceTest {
 
   private static final Instant DATE_TIME_1 = Instant.parse("2021-03-02T08:00:00.000Z");
 
-  @Mock
-  private DefaultMsCoordinatorClient defaultMsCoordinatorClient;
-  @Mock
-  private Clock clock;
-  @InjectMocks
-  private ApplicationCoordinatorService applicationCoordinatorService;
+  @Mock private DefaultMsCoordinatorClient defaultMsCoordinatorClient;
+  @Mock private Clock clock;
+  @InjectMocks private ApplicationCoordinatorService applicationCoordinatorService;
 
   @Test
   void when_getting_application_state() {
 
     String applicationId = "application-1-id";
     StateDto state = new StateDto().currentState(StateDto.CurrentStateEnum.REGISTRATION);
-    HistoryDto history =
-        new HistoryDto().state(HistoryDto.StateEnum.REGISTRATION).timestamp(DATE_TIME_1.toString());
+    ApplicationCoordinatorDto applicationCoordinatorDto =
+        new ApplicationCoordinatorDto().applicationId(applicationId).state(state);
 
-    ApplicationStateDto applicationStateDto =
-        new ApplicationStateDto()
-            .applicationId(applicationId)
-            .state(state)
-            .history(List.of(history));
-
-    when(clock.instant()).thenReturn(DATE_TIME_1);
-
-    when(defaultMsCoordinatorClient.getApplication(
-        applicationId, null, null, null)).thenReturn(applicationStateDto);
+    when(defaultMsCoordinatorClient.getApplication(applicationId, null, null, null))
+        .thenReturn(applicationCoordinatorDto);
 
     State result = applicationCoordinatorService.getApplicationState(applicationId);
 
     assertThat(result.getCurrent()).isEqualTo("REGISTRATION");
-    assertThat(result.getHistory().size()).isEqualTo(1);
-    assertThat(result.getHistory().get(0).getState()).isEqualTo("REGISTRATION");
-    assertThat(result.getHistory().get(0).getTimeStamp()).isEqualTo(DATE_TIME_1.toString());
+  }
+
+  @Test
+  void when_getting_application_state_from_dto() {
+    String applicationId = "application-1-id";
+    ApplicationCoordinatorDto applicationCoordinatorDto =
+        new ApplicationCoordinatorDto().applicationId(applicationId).state(
+            new StateDto().currentState(StateDto.CurrentStateEnum.REGISTRATION));
+
+    State result = applicationCoordinatorService.getApplicationState(applicationCoordinatorDto);
+
+    assertThat(result.getCurrent()).isEqualTo("REGISTRATION");
   }
 
   @Test
@@ -111,7 +107,8 @@ class ApplicationCoordinatorServiceTest {
     when(defaultMsCoordinatorClient.getRegistrationApplications(List.of(applicationId)))
         .thenReturn(List.of(applicationId));
 
-    List<String> result = applicationCoordinatorService.getRegistrationApplicationIds(List.of(applicationId));
+    List<String> result =
+        applicationCoordinatorService.getRegistrationApplicationIds(List.of(applicationId));
 
     assertThat(result).isEqualTo(List.of(applicationId));
   }
@@ -130,26 +127,23 @@ class ApplicationCoordinatorServiceTest {
   void when_creating_application() {
 
     String applicationId = "application-1-id";
+    String claimantId = "claimant-1-id";
     StateDto state = new StateDto().currentState(StateDto.CurrentStateEnum.REGISTRATION);
-    HistoryDto history =
-        new HistoryDto().state(HistoryDto.StateEnum.REGISTRATION).timestamp(DATE_TIME_1.toString());
 
-    ApplicationStateDto applicationStateDto =
-        new ApplicationStateDto()
+    ApplicationCoordinatorDto createApplicationDto =
+        new ApplicationCoordinatorDto().applicationId(applicationId).claimantId(claimantId);
+
+    ApplicationCoordinatorDto savedApplicationDto =
+        new ApplicationCoordinatorDto()
             .applicationId(applicationId)
-            .state(state)
-            .history(List.of(history));
+            .claimantId(claimantId)
+            .state(state);
 
-    when(clock.instant()).thenReturn(DATE_TIME_1);
+    when(defaultMsCoordinatorClient.createApplication(createApplicationDto))
+        .thenReturn(savedApplicationDto);
 
-    when(defaultMsCoordinatorClient.createApplication(applicationId)).thenReturn(applicationStateDto);
-
-    State result = applicationCoordinatorService.postApplicationId(applicationId);
+    State result = applicationCoordinatorService.postApplicationId(applicationId, claimantId);
 
     assertThat(result.getCurrent()).isEqualTo("REGISTRATION");
-    assertThat(result.getHistory().size()).isEqualTo(1);
-    assertThat(result.getHistory().get(0).getState()).isEqualTo("REGISTRATION");
-    assertThat(result.getHistory().get(0).getTimeStamp()).isEqualTo(DATE_TIME_1.toString());
   }
-
 }

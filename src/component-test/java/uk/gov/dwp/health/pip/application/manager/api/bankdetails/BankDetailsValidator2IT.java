@@ -28,7 +28,7 @@ public class BankDetailsValidator2IT extends ApiTest {
     @Test
     public void invalidBankDetails() {
         final BankDetailsValidatorV2 bankDetailsValidator = getBankDetailsValidator();
-        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_DETAILS_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID);
+        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_DETAILS_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID);
         assertThat(validate.getResults().length).isEqualTo(1);
         assertThat(validate.getResults()[0]).isEqualTo(ROLL_NUMBER_FORMAT);
     }
@@ -36,7 +36,7 @@ public class BankDetailsValidator2IT extends ApiTest {
     @Test
     public void invalidAccountNumber() {
         final BankDetailsValidatorV2 bankDetailsValidator = getBankDetailsValidator();
-        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID);
+        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID);
         assertThat(validate.getResults().length).isEqualTo(1);
         assertThat(validate.getResults()[0]).isEqualTo(INVALID_SORT_CODE_ACCOUNT_NUMBER_DATA_FORMAT);
     }
@@ -44,7 +44,7 @@ public class BankDetailsValidator2IT extends ApiTest {
     @Test
     public void validAccountNumberUnexpectedWarningReturned() {
         final BankDetailsValidatorV2 bankDetailsValidator = getBankDetailsValidator();
-        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER_UNEXPECTED_WARNING, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID);
+        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER_UNEXPECTED_WARNING, SORT_CODE, ROLL_NUMBER, CONSUMER_ID);
         assertThat(validate.getResults().length).isEqualTo(1);
         assertThat(validate.getResults()[0]).isEqualTo(VALID);
     }
@@ -52,7 +52,7 @@ public class BankDetailsValidator2IT extends ApiTest {
     @Test //htgt-3481 add warning/002 to the ignore list
     public void invalidAccountNumberReturningMultipleWarnings() {
         final BankDetailsValidatorV2 bankDetailsValidator = getBankDetailsValidator();
-        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER2, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID);
+        final BankDetailsValidityList validate = bankDetailsValidator.validate(INVALID_ACCOUNT_NUMBER2, SORT_CODE, ROLL_NUMBER, CONSUMER_ID);
         // this account num 20000265 returns 2 warnings - a 2 and a 65. We ignore the 2 so...:
         assertThat(validate.getResults().length).isEqualTo(1);
         // warnings 65 => ROLL_NUMBER_REQUIRED
@@ -62,7 +62,7 @@ public class BankDetailsValidator2IT extends ApiTest {
     @Test
     public void shouldReturn200StatusCodeAndCorrectResponseBody() {
         final BankDetailsValidatorV2 bankDetailsValidator = getBankDetailsValidator();
-        final BankDetailsValidityList validate = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID, CORRELATION_ID);
+        final BankDetailsValidityList validate = bankDetailsValidator.validate(ACCOUNT_NUMBER, SORT_CODE, ROLL_NUMBER, CONSUMER_ID);
         assertThat(validate.getResults()).isNotNull();
         assertThat(validate.getResults().length).isEqualTo(1);
         assertThat(validate.getResults()[0]).isEqualTo(VALID);

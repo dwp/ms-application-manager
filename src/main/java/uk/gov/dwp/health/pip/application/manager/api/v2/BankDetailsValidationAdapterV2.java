@@ -26,8 +26,7 @@ public class BankDetailsValidationAdapterV2 implements V2Api {
         account.getAccountNumber(),
         account.getSortCode(),
         account.getRollNumber(),
-        consumerId,
-        correlationId);
+        consumerId);
     final List<String> resultsAsStrings = bankDetailsValidity.getResultsAsStrings();
     log.info("validated bank details {}", resultsAsStrings);
     return new ResponseEntity<>(resultsAsStrings, HttpStatus.OK);
