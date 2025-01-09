@@ -19,10 +19,6 @@ public class UrlBuilderUtil {
     return baseURI + "/v1/application/" + applicationId + "/registration";
   }
 
-  public static String buildGetClaimantIdAndStatusByIdUrl(String applicationId) {
-    return baseURI + "/v1/application/" + applicationId + "/status";
-  }
-
   public static String buildGetRegistrationByIdV2Url(String applicationId) {
     return baseURI + "/v2/application/" + applicationId + "/registration";
   }
@@ -57,6 +53,10 @@ public class UrlBuilderUtil {
 
   public static String buildPostBankDetailsUrl() {
     return baseURI + "/v1/validate";
+  }
+
+  public static String buildGetRegistrationStatusByIdV5Url(String applicationId) {
+    return baseURI + "/v5/application/status?application_id=" + applicationId;
   }
 
   public static String buildGetClaimantsWithState(

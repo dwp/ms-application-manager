@@ -50,8 +50,6 @@ class RegistrationDataGetterTest {
 
       String applicationId = "application-id-1";
 
-      Application application = Application.builder().id(applicationId).build();
-
       when(repository.findAllByClaimantId(CLAIMANT_ID))
           .thenReturn(Collections.singletonList(getUnsubmittedApplication(applicationId)));
       when(applicationCoordinatorService.getRegistrationApplicationIds(anyList()))
@@ -64,8 +62,6 @@ class RegistrationDataGetterTest {
             assertThat(registrationDto.getApplicationId()).isEqualTo("application-id-1");
             assertThat(registrationDto.getFormData()).isEqualTo("{REGISTRATION_FORM_DATA}");
             assertThat(registrationDto.getMeta()).isEqualTo("meta");
-            assertThat(registrationDto.getApplicationStatus())
-                .isEqualTo(RegistrationDto.ApplicationStatusEnum.REGISTRATION);
             assertThat(registrationDto.getSubmissionDate()).isEmpty();
           });
     }
@@ -118,8 +114,6 @@ class RegistrationDataGetterTest {
             assertThat(registrationDto.getApplicationId()).isEqualTo("application-id-1");
             assertThat(registrationDto.getFormData()).isEqualTo("{REGISTRATION_FORM_DATA}");
             assertThat(registrationDto.getMeta()).isEqualTo("meta");
-            assertThat(registrationDto.getApplicationStatus())
-                .isEqualTo(RegistrationDto.ApplicationStatusEnum.REGISTRATION);
             assertThat(registrationDto.getSubmissionDate()).isEmpty();
           });
     }
@@ -140,8 +134,6 @@ class RegistrationDataGetterTest {
       assertThat(registrationDto.getApplicationId()).isEqualTo("application-id-1");
       assertThat(registrationDto.getFormData()).isEqualTo("{REGISTRATION_FORM_DATA}");
       assertThat(registrationDto.getMeta()).isEqualTo("meta");
-      assertThat(registrationDto.getApplicationStatus())
-          .isEqualTo(RegistrationDto.ApplicationStatusEnum.HEALTH_AND_DISABILITY);
       assertThat(registrationDto.getSubmissionDate()).isEqualTo("2022-03-27");
     }
 
@@ -165,7 +157,6 @@ class RegistrationDataGetterTest {
     formData.setMeta("meta");
     formData.setType(FormType.REGISTRATION);
     application.setRegistrationData(formData);
-    application.setState(state);
     return application;
   }
 
@@ -184,7 +175,6 @@ class RegistrationDataGetterTest {
     formData.setMeta("meta");
     formData.setType(FormType.REGISTRATION);
     application.setRegistrationData(formData);
-    application.setState(state);
     application.setPipcsRegistrationState(legacyRegistrationState);
     application.setDateRegistrationSubmitted(LocalDate.of(2022, Month.MARCH, 27));
     return application;

@@ -22,9 +22,7 @@ public class ApplicationApiAdapter implements V1Api {
   @Override
   public ResponseEntity<ApplicationDto> createApplication(
       ApplicationCreateDto applicationCreateDto) {
-
     ApplicationDto applicationDto = applicationCreator.createApplication(applicationCreateDto);
-
     return ResponseEntity.status(HttpStatus.CREATED).body(applicationDto);
   }
 
@@ -32,7 +30,6 @@ public class ApplicationApiAdapter implements V1Api {
   public ResponseEntity<ApplicationId> getApplicationIdByNino(NinoDto ninoDto) {
     ApplicationId applicationId =
         applicationIdsByNinoGetter.getApplicationIdByNino(ninoDto.getNino());
-
     return ResponseEntity.status(HttpStatus.OK).body(applicationId);
   }
 }

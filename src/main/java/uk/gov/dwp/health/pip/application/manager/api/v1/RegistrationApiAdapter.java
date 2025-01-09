@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.V1Api;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ApplicationCoordinatorStatusDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
 import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
@@ -26,20 +25,20 @@ public class RegistrationApiAdapter implements V1Api {
   @Override
   public ResponseEntity<RegistrationDto> getRegistrationData(String claimantId) {
     RegistrationDto registrationDto =
-        registrationDataGetter.getRegistrationDataByClaimantId(claimantId);
+            registrationDataGetter.getRegistrationDataByClaimantId(claimantId);
     return ResponseEntity.status(HttpStatus.OK).body(registrationDto);
   }
 
   @Override
   public ResponseEntity<RegistrationDto> getRegistrationDataByApplicationId(String applicationId) {
     RegistrationDto registrationDto =
-        registrationDataGetter.getRegistrationDataByApplicationId(applicationId);
+            registrationDataGetter.getRegistrationDataByApplicationId(applicationId);
     return ResponseEntity.status(HttpStatus.OK).body(registrationDto);
   }
 
   @Override
   public ResponseEntity<Void> updateRegistrationData(
-      String applicationId, FormDataDto formDataDto) {
+          String applicationId, FormDataDto formDataDto) {
     registrationDataUpdater.updateRegistrationDataByApplicationId(applicationId, formDataDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
@@ -57,11 +56,4 @@ public class RegistrationApiAdapter implements V1Api {
     return ResponseEntity.ok().body(status);
   }
 
-  @Override
-  public ResponseEntity<ClaimantIdAndApplicationStatus> getClaimantIdAndStatus(
-      String applicationId) {
-    ClaimantIdAndApplicationStatus status =
-        applicationStatusGetter.getClaimantIdAndStatus(applicationId);
-    return ResponseEntity.ok().body(status);
-  }
 }

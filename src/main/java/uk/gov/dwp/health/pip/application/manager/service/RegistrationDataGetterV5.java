@@ -91,8 +91,10 @@ public class RegistrationDataGetterV5 {
   private String getNinoFromPersonalDetails(Application application) {
     if (application.getRegistrationData().getData() != null) {
       RegistrationSchema140 registrationSchema = registrationDataMarshaller
-          .marshallRegistrationData(application.getRegistrationData().getData());
-      return registrationSchema.getPersonalDetails().getNino();
+          .marshallRegistrationData(application.getRegistrationData().getData(), false);
+      return registrationSchema.getPersonalDetails() != null
+          ? registrationSchema.getPersonalDetails().getNino()
+          : null;
     }
     return null;
   }

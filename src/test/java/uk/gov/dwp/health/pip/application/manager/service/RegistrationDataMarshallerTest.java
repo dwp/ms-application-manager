@@ -37,6 +37,18 @@ class RegistrationDataMarshallerTest {
   }
 
   @Test
+  void when_valid_no_validation_call() throws IOException {
+    Map<String, Object> map = readTestFile("mapping/validRegistrationData.json");
+    final RegistrationSchema140 registrationSchema = registrationDataMarshaller.marshallRegistrationData(map, false);
+    assertThat(registrationSchema.getPersonalDetails().getSurname()).isEqualTo("Azzzle");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getEnterBankDetails()).isNotNull();
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountName")).isEqualTo("Bank of Yorkshire");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("accountNumber")).isEqualTo("12341234");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("sortCode")).isEqualTo("123123");
+    assertThat(registrationSchema.getPersonalDetails().getBankDetails().getAdditionalProperties().get("rollNumber")).isEqualTo("123123123");
+  }
+
+  @Test
   void when_bank_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/bankDetailsMissing.json");
     final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
@@ -44,9 +56,23 @@ class RegistrationDataMarshallerTest {
   }
 
   @Test
+  void when_bank_details_missing_no_validation() throws IOException {
+    Map<String, Object> map = readTestFile("mapping/bankDetailsMissing.json");
+    final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map, false);
+    assertThat(registrationData).isNotNull();
+  }
+
+  @Test
   void when_motability_details_missing() throws IOException {
     Map<String, Object> map = readTestFile("mapping/motabilityDetailsMissing.json");
     final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map);
+    assertThat(registrationData).isNotNull();
+  }
+
+  @Test
+  void when_motability_details_missing_no_validation() throws IOException {
+    Map<String, Object> map = readTestFile("mapping/motabilityDetailsMissing.json");
+    final RegistrationSchema140 registrationData = registrationDataMarshaller.marshallRegistrationData(map, false);
     assertThat(registrationData).isNotNull();
   }
 
@@ -64,4 +90,12 @@ class RegistrationDataMarshallerTest {
         .isInstanceOf(RegistrationDataNotValid.class)
         .hasMessage("Registration data not valid. Constraint violations present.");
   }
+
+  @Test
+  void when_not_valid_validation_bypassed() throws IOException {
+    Map<String, Object> map = readTestFile("mapping/invalidRegistrationData.json");
+    registrationDataMarshaller.marshallRegistrationData(map, false);
+  }
+
+
 }

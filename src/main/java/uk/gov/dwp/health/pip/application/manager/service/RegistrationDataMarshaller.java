@@ -19,21 +19,25 @@ import java.util.Set;
 public class RegistrationDataMarshaller {
 
   private final ObjectMapper objectMapper;
-  
-  RegistrationSchema140 marshallRegistrationData(Object registrationData) {
+
+  RegistrationSchema140 marshallRegistrationData(Object registrationData, boolean validate) {
     RegistrationSchema140 registrationSchema = getRegistrationSchema140(registrationData);
-    
-    if (registrationSchema != null) {
+
+    if (registrationSchema != null && validate) {
       validate(registrationSchema);
     }
-    
+
     return registrationSchema;
   }
-  
+
+  RegistrationSchema140 marshallRegistrationData(Object registrationData) {
+    return marshallRegistrationData(registrationData, true);
+  }
+
   private RegistrationSchema140 getRegistrationSchema140(Object registrationData) {
     return getRegistrationSchema(registrationData, RegistrationSchema140.class);
   }
-  
+
   private <T> T getRegistrationSchema(Object registrationData, Class<T> registrationSchemaVersion) {
     try {
       byte[] bytes = objectMapper.writeValueAsBytes(registrationData);
@@ -49,12 +53,12 @@ public class RegistrationDataMarshaller {
         "Registration data not valid. Problem when marshalling to objects.");
     }
   }
-  
+
   private <T> void validate(T registrationSchema) {
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     Set<ConstraintViolation<T>> constraintViolations =
         validator.validate(registrationSchema);
-    
+
     if (!constraintViolations.isEmpty()) {
       log.error(
           "Registration data not valid. Constraint violations present. {}",

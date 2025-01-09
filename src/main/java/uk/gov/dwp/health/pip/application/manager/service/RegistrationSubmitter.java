@@ -126,13 +126,6 @@ public class RegistrationSubmitter {
   }
 
   private void setApplicationState(Application application) {
-    application
-        .getState()
-        .addHistory(
-            History.builder()
-                .state(ApplicationState.HEALTH_AND_DISABILITY.toString())
-                .timeStamp(clock.instant())
-                .build());
     applicationCoordinatorService.updateState(
         application.getId(), StateDto.CurrentStateEnum.HEALTH_AND_DISABILITY);
   }
@@ -142,6 +135,7 @@ public class RegistrationSubmitter {
   }
 
   private void isAllowedSubmitRegistration(Application application) {
+
     if (application.getPipcsRegistrationState() != null) {
       var currentRegistrationState = application.getPipcsRegistrationState().getCurrent();
       if (currentRegistrationState != null
@@ -152,7 +146,7 @@ public class RegistrationSubmitter {
                 + "is pending and time lock active");
       }
     }
-    var currentApplicationState =
+    State currentApplicationState =
         applicationCoordinatorService.getApplicationState(application.getId());
 
     if (ApplicationState.valueOf(currentApplicationState.getCurrent()).getValue()

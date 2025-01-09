@@ -22,7 +22,6 @@ import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.App
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.ClaimantIdAndApplicationStatus;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.FormDataDto;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v1.dto.RegistrationDto;
-import uk.gov.dwp.health.pip.application.manager.service.ApplicationStatusGetter;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationDataGetter;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationDataUpdater;
 import uk.gov.dwp.health.pip.application.manager.service.RegistrationSubmitter;
@@ -35,7 +34,6 @@ class RegistrationApiAdapterTest {
   @Mock private RegistrationDataGetter registrationDataGetter;
   @Mock private RegistrationDataUpdater registrationDataUpdater;
   @Mock private RegistrationSubmitter registrationSubmitter;
-  @Mock private ApplicationStatusGetter applicationStatusGetter;
   @InjectMocks private RegistrationApiAdapter registrationApiAdapter;
 
   @Test
@@ -105,51 +103,4 @@ class RegistrationApiAdapterTest {
         });
   }
 
-  @Test
-  void should_return_application_status_application_status_getter_invoked() {
-    var claimantId = UUID.randomUUID().toString();
-    var applicationDto = new ApplicationCoordinatorStatusDto();
-    applicationDto.setApplicationStatus(
-        ApplicationCoordinatorStatusDto.ApplicationStatusEnum.REGISTRATION);
-    when(applicationStatusGetter.getApplicationStatusByClaimantId(anyString()))
-        .thenReturn(applicationDto);
-    var actual = registrationApiAdapter.getApplicationStatus(claimantId);
-
-    assertAll(
-        "assert application status response to be 200 and body with current status",
-        () -> {
-          var httpStatus = actual.getStatusCode();
-          assertThat(httpStatus).isEqualTo(HttpStatus.OK);
-          var applicationStatus =
-              Objects.requireNonNull(actual.getBody()).getApplicationStatus().getValue();
-          assertThat(applicationStatus).isEqualTo("REGISTRATION");
-        });
-    var strCaptor = ArgumentCaptor.forClass(String.class);
-    verify(applicationStatusGetter).getApplicationStatusByClaimantId(strCaptor.capture());
-    assertThat(strCaptor.getValue()).isEqualTo(claimantId);
-  }
-
-  @Test
-  void should_return_application_status_and_claimant_id_when_getter_invoked() {
-    var applicationId = UUID.randomUUID().toString();
-    var claimantIdAndStatusDto = new ClaimantIdAndApplicationStatus();
-    claimantIdAndStatusDto.setApplicationStatus(
-        ClaimantIdAndApplicationStatus.ApplicationStatusEnum.REGISTRATION);
-    when(applicationStatusGetter.getClaimantIdAndStatus(anyString()))
-        .thenReturn(claimantIdAndStatusDto);
-    var actual = registrationApiAdapter.getClaimantIdAndStatus(applicationId);
-
-    assertAll(
-        "assert application status response to be 200 and body with current status",
-        () -> {
-          var httpStatus = actual.getStatusCode();
-          assertThat(httpStatus).isEqualTo(HttpStatus.OK);
-          var applicationStatus =
-              Objects.requireNonNull(actual.getBody()).getApplicationStatus().getValue();
-          assertThat(applicationStatus).isEqualTo("REGISTRATION");
-        });
-    var strCaptor = ArgumentCaptor.forClass(String.class);
-    verify(applicationStatusGetter).getClaimantIdAndStatus(strCaptor.capture());
-    assertThat(strCaptor.getValue()).isEqualTo(applicationId);
-  }
 }

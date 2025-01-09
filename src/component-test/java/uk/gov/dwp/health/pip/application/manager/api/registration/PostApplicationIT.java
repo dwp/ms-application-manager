@@ -37,7 +37,6 @@ public class PostApplicationIT extends ApiTest {
         extractPostRequest(url, registration, CreatedApplication.class);
 
     assertThat(createdApplication.getApplicationId()).matches("^[a-zA-Z0-9]{24}$");
-    assertThat(createdApplication.getApplicationStatus()).isEqualTo("REGISTRATION");
   }
 
   @Test

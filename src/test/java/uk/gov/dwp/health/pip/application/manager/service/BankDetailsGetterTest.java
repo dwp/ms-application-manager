@@ -99,7 +99,6 @@ class BankDetailsGetterTest {
     formData.setMeta("meta");
     formData.setType(FormType.REGISTRATION);
     application.setRegistrationData(formData);
-    application.setState(state);
     application.setPipcsRegistrationState(legacyRegistrationState);
     application.setDateRegistrationSubmitted(LocalDate.of(2022, Month.MARCH, 27));
     return application;

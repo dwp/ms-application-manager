@@ -7,7 +7,7 @@ include:
     ref: 2.4.0
     file: 'ci-include-fragment-version-check-base.yml'
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/required-fragment-check'
-    ref: 2.12.1
+    ref: 2.13.0
     file: 'ci-include-required-fragment-check-base.yml'
   #update-version
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/update-semver'
@@ -31,7 +31,7 @@ include:
     file: 'ci-include-docker-lint-base.yml'
     #code-test
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/maven-api-test'
-    ref: 3.6.2
+    ref: 3.7.0
     file: 'ci-include-maven-api-test-base.yml'
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/docker-compose-run'
     ref: 3.4.0
@@ -62,7 +62,7 @@ include:
     ref: 2.11.0
     file: 'ci-include-sast-container-check-base.yml'
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/trivy-container-check'
-    ref: 2.17.1
+    ref: 2.21.0
     file: 'ci-include-trivy-container-check-base.yml'
   - project: 'dwp/engineering/pipeline-solutions/gitlab/fragments/container-structure-test'
     ref: 2.10.0

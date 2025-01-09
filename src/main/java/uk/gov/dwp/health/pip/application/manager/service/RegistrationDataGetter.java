@@ -69,8 +69,6 @@ public class RegistrationDataGetter {
     registrationDto.setFormData(application.getRegistrationData().getData());
     registrationDto.meta(application.getRegistrationData().getMeta());
     registrationDto.setApplicationId(application.getId());
-    registrationDto.setApplicationStatus(
-        RegistrationDto.ApplicationStatusEnum.valueOf(application.getState().getCurrent()));
     registrationDto.setSubmissionDate(
         Optional.ofNullable(application.getDateRegistrationSubmitted())
             .map(LocalDate::toString)

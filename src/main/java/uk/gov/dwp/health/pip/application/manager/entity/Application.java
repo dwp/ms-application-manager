@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import uk.gov.dwp.health.mongo.changestream.extension.MongoChangeStreamIdentifier;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
+import uk.gov.dwp.health.pip.application.manager.exception.ProhibitedActionException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -99,5 +100,9 @@ public class Application extends MongoChangeStreamIdentifier {
       audit = Audit.builder().build();
     }
     return audit;
+  }
+
+  public void setState(State state) {
+    throw new ProhibitedActionException("Application State to be track in Coordinator");
   }
 }

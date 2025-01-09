@@ -28,24 +28,23 @@ class GetRegistrationByIdIT extends ApiTest {
     var mongoTemplate = MongoClientConnection.getMongoTemplate();
 
     var application =
-        Application.builder()
-            .state(State.builder().current("SUBMITTED").build())
-            .registrationData(FormData.builder().data("form data").meta("meta").build())
-            .dateRegistrationSubmitted(LocalDate.of(2022, Month.MARCH, 27))
-            .build();
+            Application.builder()
+                    .state(State.builder().current("SUBMITTED").build())
+                    .registrationData(FormData.builder().data("form data").meta("meta").build())
+                    .dateRegistrationSubmitted(LocalDate.of(2022, Month.MARCH, 27))
+                    .build();
     var savedApplication = mongoTemplate.save(application, "application");
 
     var url = buildGetRegistrationByIdUrl(savedApplication.getId());
     int actualResponseCode = getRequest(url).statusCode();
     uk.gov.dwp.health.pip.application.manager.responsemodels.Application responseApplication =
-        extractGetRequest(
-            url, uk.gov.dwp.health.pip.application.manager.responsemodels.Application.class);
+            extractGetRequest(
+                    url, uk.gov.dwp.health.pip.application.manager.responsemodels.Application.class);
 
     assertThat(actualResponseCode).isEqualTo(200);
     assertThat(responseApplication.getApplicationId()).isEqualTo(savedApplication.getId());
     assertThat(responseApplication.getFormData()).isEqualTo("form data");
     assertThat(responseApplication.getMeta()).isEqualTo("meta");
-    assertThat(responseApplication.getApplicationStatus()).isEqualTo("SUBMITTED");
     assertThat(responseApplication.getSubmissionDate()).isEqualTo("2022-03-27");
   }
 
@@ -70,20 +69,20 @@ class GetRegistrationByIdIT extends ApiTest {
     UpdateRegistration updatedApplicationBody = UpdateRegistration.builder().build();
 
     Application application =
-        Application.builder()
-            .id(applicationId) // create id with mocked return for HAD
-            .claimantId(claimantId)
-            .pipcsRegistrationState(State.builder().current("SUBMITTED").build())
-            .registrationData(
-                FormData.builder()
-                    .data(updatedApplicationBody.getFormData())
-                    .meta(updatedApplicationBody.getMeta())
-                    .build())
-            .dateRegistrationSubmitted(LocalDate.of(2025, Month.MARCH, 27))
-            .effectiveFrom(LocalDate.of(2025, Month.MARCH, 27))
-            .effectiveTo(LocalDate.of(2025, Month.MARCH, 27).plusDays(90))
-            .language(Language.EN)
-            .build();
+            Application.builder()
+                    .id(applicationId) // create id with mocked return for HAD
+                    .claimantId(claimantId)
+                    .pipcsRegistrationState(State.builder().current("SUBMITTED").build())
+                    .registrationData(
+                            FormData.builder()
+                                    .data(updatedApplicationBody.getFormData())
+                                    .meta(updatedApplicationBody.getMeta())
+                                    .build())
+                    .dateRegistrationSubmitted(LocalDate.of(2025, Month.MARCH, 27))
+                    .effectiveFrom(LocalDate.of(2025, Month.MARCH, 27))
+                    .effectiveTo(LocalDate.of(2025, Month.MARCH, 27).plusDays(90))
+                    .language(Language.EN)
+                    .build();
     return mongoTemplate.save(application, "application");
   }
 }

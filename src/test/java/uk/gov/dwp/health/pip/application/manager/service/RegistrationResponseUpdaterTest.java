@@ -117,8 +117,7 @@ class RegistrationResponseUpdaterTest {
     var audit = new Audit();
     audit.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
     application.setAudit(audit);
-    application.setState(State.builder().current("HEALTH_AND_DISABILITY").build());
-    return application;
+      return application;
   }
 
   private static PipGatewayRespondEventSchemaV1 responseFixture() {

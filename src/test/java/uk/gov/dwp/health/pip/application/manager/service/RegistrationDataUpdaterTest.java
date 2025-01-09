@@ -66,7 +66,6 @@ class RegistrationDataUpdaterTest {
     formDataDto.setMeta("meta");
 
     var existingApplication = applicationFixture();
-
     existingApplication.setId(applicationId);
 
     when(repository.findById(anyString())).thenReturn(Optional.of(existingApplication));
@@ -118,7 +117,6 @@ class RegistrationDataUpdaterTest {
     var audit = new Audit();
     audit.setLastModified(Instant.now().minus(1, ChronoUnit.DAYS));
     application.setAudit(audit);
-    application.setState(State.builder().current("REGISTRATION").build());
     return application;
   }
 }

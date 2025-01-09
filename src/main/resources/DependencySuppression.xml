@@ -10,20 +10,18 @@
     <cve>CVE-2024-21634</cve>
   </suppress>
   <suppress>
+    <notes><![CDATA[file name: netty-common-4.1.114.Final.jar]]></notes>
+    <cve>CVE-2024-47535</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[file name: logback-core-1.5.11.jar]]></notes>
+    <cve>CVE-2024-12798</cve>
+  </suppress>
+  <suppress>
     <notes><![CDATA[file name: springfox-swagger-ui-3.0.0.jar]]></notes>
     <cve>CVE-2024-45801</cve>
     <cve>CVE-2020-26870</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[file name: spring-web-6.1.6.jar]]></notes>
-    <cve>CVE-2024-38809</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[file name: prometheus-metrics-core-1.2.1.jar]]></notes>
-    <cve>CVE-2019-3826</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[file name: springfox-swagger-ui-3.0.0.jar]]></notes>
     <cve>CVE-2024-47875</cve>
+    <cve>CVE-2024-48910</cve>
   </suppress>
 </suppressions>

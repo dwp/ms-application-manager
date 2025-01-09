@@ -8,19 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientException;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
+import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AboutYourHealthSchema120;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.AdditionalSupportSchema100;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.PersonalDetailsSchema120;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.RegistrationSchema140;
-import uk.gov.dwp.health.pip.application.manager.model.registration.data.ResidenceAndPresenceSchema110;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AboutYourHealthDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.AdditionalSupportDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.PersonalDetailsDto;
+import uk.gov.dwp.health.pip.application.manager.model.registration.data.*;
+import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.*;
 import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.RegistrationDto.LanguageEnum;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.ResidenceAndPresenceDto;
-import uk.gov.dwp.health.pip.application.manager.openapi.registration.v3.dto.StateDto;
+import uk.gov.dwp.health.pip.application.manager.service.ApplicationCoordinatorService;
 
 import java.time.LocalDate;
 
@@ -32,26 +27,34 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 class RegistrationDataMapperV3Test {
 
-  @Mock private AboutYourHealthMapperV3 aboutYourHealthMapperV3;
-  @Mock private AdditionalSupportMapperV3 additionalSupportMapperV3;
-  @Mock private PersonalDetailsMapperV3 personalDetailsMapperV3;
-  @Mock private ResidenceAndPresenceMapperV3 residenceAndPresenceMapperV3;
-  @Mock private StateDtoMapperV3 stateDtoMapperV3;
+  @Mock
+  private AboutYourHealthMapperV3 aboutYourHealthMapperV3;
+  @Mock
+  private AdditionalSupportMapperV3 additionalSupportMapperV3;
+  @Mock
+  private PersonalDetailsMapperV3 personalDetailsMapperV3;
+  @Mock
+  private ResidenceAndPresenceMapperV3 residenceAndPresenceMapperV3;
+  @Mock
+  private StateDtoMapperV3 stateDtoMapperV3;
+  @Mock
+  private ApplicationCoordinatorService applicationCoordinatorService;
 
-  @InjectMocks private RegistrationDataMapperV3 registrationDataMapperV3;
+  @InjectMocks
+  private RegistrationDataMapperV3 registrationDataMapperV3;
 
   @Test
-  void when_mapping_form_to_api() {
+  void when_mapping_form_to_api_with_coordinator_state() {
     var testDate = LocalDate.now();
 
     var application = Application.builder()
-        .dateRegistrationSubmitted(testDate)
-        .effectiveFrom(testDate)
-        .effectiveTo(testDate)
-        .claimantId("123456879")
-        .language(Language.CY)
-        .build();
-    
+            .dateRegistrationSubmitted(testDate)
+            .effectiveFrom(testDate)
+            .effectiveTo(testDate)
+            .claimantId("123456879")
+            .language(Language.CY)
+            .build();
+
     RegistrationSchema140 registrationSchema100 = getRegistrationData();
 
     var personalDetailsDto = new PersonalDetailsDto();
@@ -59,17 +62,21 @@ class RegistrationDataMapperV3Test {
     var residenceAndPresenceDto = new ResidenceAndPresenceDto();
     var additionalSupportDto = new AdditionalSupportDto();
     var stateDto = new StateDto();
+    var state = State.builder().current("REGISTRATION").build();
 
     when(personalDetailsMapperV3.toDto(registrationSchema100.getPersonalDetails()))
-        .thenReturn(personalDetailsDto);
+            .thenReturn(personalDetailsDto);
     when(aboutYourHealthMapperV3.toDto(registrationSchema100.getAboutYourHealth()))
-        .thenReturn(aboutYourHealthDto);
+            .thenReturn(aboutYourHealthDto);
     when(additionalSupportMapperV3.toDto(registrationSchema100.getAdditionalSupport()))
             .thenReturn(additionalSupportDto);
     when(residenceAndPresenceMapperV3.toDto(registrationSchema100.getResidenceAndPresence()))
             .thenReturn(residenceAndPresenceDto);
-    when(stateDtoMapperV3.toDto(application.getState()))
-        .thenReturn(stateDto);
+
+    when(applicationCoordinatorService.getApplicationState(application.getId()))
+            .thenReturn(state);
+    when(stateDtoMapperV3.toDto(state))
+            .thenReturn(stateDto);
 
     var registrationDto = registrationDataMapperV3.toDto(application, registrationSchema100);
 
@@ -83,7 +90,55 @@ class RegistrationDataMapperV3Test {
     assertThat(registrationDto.getAboutYourHealth()).isEqualTo(aboutYourHealthDto);
     assertThat(registrationDto.getResidenceAndPresence()).isEqualTo(residenceAndPresenceDto);
     assertThat(registrationDto.getAdditionalSupport()).isEqualTo(additionalSupportDto);
-    assertThat(registrationDto.getStateDto()).isEqualTo(stateDto);
+  }
+
+  @Test
+  void when_mapping_form_to_api_with_application_state() {
+    var testDate = LocalDate.now();
+
+    var application = Application.builder()
+            .dateRegistrationSubmitted(testDate)
+            .effectiveFrom(testDate)
+            .effectiveTo(testDate)
+            .claimantId("123456879")
+            .language(Language.CY)
+            .state(State.builder().current("REGISTRATION").build())
+            .build();
+
+    RegistrationSchema140 registrationSchema100 = getRegistrationData();
+
+    var personalDetailsDto = new PersonalDetailsDto();
+    var aboutYourHealthDto = new AboutYourHealthDto();
+    var residenceAndPresenceDto = new ResidenceAndPresenceDto();
+    var additionalSupportDto = new AdditionalSupportDto();
+    var stateDto = new StateDto();
+
+    when(personalDetailsMapperV3.toDto(registrationSchema100.getPersonalDetails()))
+            .thenReturn(personalDetailsDto);
+    when(aboutYourHealthMapperV3.toDto(registrationSchema100.getAboutYourHealth()))
+            .thenReturn(aboutYourHealthDto);
+    when(additionalSupportMapperV3.toDto(registrationSchema100.getAdditionalSupport()))
+            .thenReturn(additionalSupportDto);
+    when(residenceAndPresenceMapperV3.toDto(registrationSchema100.getResidenceAndPresence()))
+            .thenReturn(residenceAndPresenceDto);
+
+    when(applicationCoordinatorService.getApplicationState(application.getId()))
+            .thenThrow(new RestClientException(""));
+    when(stateDtoMapperV3.toDto(application.getState()))
+            .thenReturn(stateDto);
+
+    var registrationDto = registrationDataMapperV3.toDto(application, registrationSchema100);
+
+    assertThat(registrationDto.getClaimantId()).isEqualTo("123456879");
+    assertThat(registrationDto.getEffectiveFrom()).isEqualTo(testDate.toString());
+    assertThat(registrationDto.getEffectiveTo()).isEqualTo(testDate.toString());
+    assertThat(registrationDto.getLanguage()).isEqualTo(LanguageEnum.CY);
+
+    assertThat(registrationDto.getSubmissionDate()).isEqualTo(testDate.toString());
+    assertThat(registrationDto.getPersonalDetails()).isEqualTo(personalDetailsDto);
+    assertThat(registrationDto.getAboutYourHealth()).isEqualTo(aboutYourHealthDto);
+    assertThat(registrationDto.getResidenceAndPresence()).isEqualTo(residenceAndPresenceDto);
+    assertThat(registrationDto.getAdditionalSupport()).isEqualTo(additionalSupportDto);
   }
 
   private RegistrationSchema140 getRegistrationData() {

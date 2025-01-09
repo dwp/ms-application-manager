@@ -73,7 +73,7 @@ class RegistrationDataGetterV5Test {
     personalDetails.setNino(nino);
     schema.setPersonalDetails(personalDetails);
     doReturn(schema).when(registrationDataMarshaller)
-        .marshallRegistrationData(any());
+        .marshallRegistrationData(any(), eq(false));
     V5ApplicationStatus result = registrationDataGetterV5.getRegistrationDataById(
         noNinoApplicationId, null, null, null);
     assertThat(result).isNotNull();

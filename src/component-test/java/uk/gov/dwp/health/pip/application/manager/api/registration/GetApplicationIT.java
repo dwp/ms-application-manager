@@ -33,7 +33,6 @@ public class GetApplicationIT extends ApiTest {
 
     assertThat(actualResponseCode).isEqualTo(200);
     assertThat(applicationRegistration.getApplicationId()).matches("^[a-zA-Z0-9]{24}$");
-    assertThat(applicationRegistration.getApplicationStatus()).isEqualTo("REGISTRATION");
   }
 
   @Test
@@ -58,13 +57,11 @@ public class GetApplicationIT extends ApiTest {
         uk.gov.dwp.health.pip.application.manager.entity.Application.builder()
             .id("5ed0d430716609122be7a4d1")
             .claimantId("300000000000000000000409")
-            .state(State.builder().current(ApplicationState.REGISTRATION.name()).build())
             .build();
     var application2 =
         uk.gov.dwp.health.pip.application.manager.entity.Application.builder()
             .id("5ed0d430716609122be7a4d2")
             .claimantId("300000000000000000000409")
-            .state(State.builder().current(ApplicationState.REGISTRATION.name()).build())
             .build();
     mongoTemplate.save(application1, "application");
     mongoTemplate.save(application2, "application");

@@ -8,11 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.health.pip.application.manager.config.properties.ApplicationProperties;
-import uk.gov.dwp.health.pip.application.manager.constant.ApplicationState;
 import uk.gov.dwp.health.pip.application.manager.entity.Application;
 import uk.gov.dwp.health.pip.application.manager.entity.Audit;
 import uk.gov.dwp.health.pip.application.manager.entity.FormData;
-import uk.gov.dwp.health.pip.application.manager.entity.History;
 import uk.gov.dwp.health.pip.application.manager.entity.State;
 import uk.gov.dwp.health.pip.application.manager.entity.enums.Language;
 import uk.gov.dwp.health.pip.application.manager.openapi.v1.dto.ApplicationCreateDto;
@@ -56,20 +54,13 @@ public class ApplicationCreator {
 
   private boolean hasActiveApplication(String claimantId) {
     List<Application> applications = applicationRepository.findAllByClaimantId(claimantId);
-
     List<String> ids = applications.stream().map(Application::getId).toList();
-
     return applicationCoordinatorService.hasActiveApplications(ids);
   }
 
   private Application toModel(ApplicationCreateDto applicationCreateDto) {
     LocalDate today = LocalDate.now();
     Instant now = clock.instant();
-
-    History applicationStateHistory =
-        History.builder().state(ApplicationState.REGISTRATION.toString()).timeStamp(now).build();
-    State applicationState = new State();
-    applicationState.addHistory(applicationStateHistory);
 
     return Application.builder()
         .audit(Audit.builder().created(now).lastModified(now).build())
@@ -78,7 +69,6 @@ public class ApplicationCreator {
         .effectiveFrom(today)
         .effectiveTo(today.plusDays(applicationProperties.getActiveDuration()))
         .language(Language.valueOf(applicationCreateDto.getLanguage().getValue()))
-        .state(applicationState)
         .registrationData(FormData.builder().build())
         .pipcsRegistrationState(State.builder().build())
         .build();
@@ -86,8 +76,6 @@ public class ApplicationCreator {
 
   private ApplicationDto toDto(Application application) {
     return new ApplicationDto()
-        .applicationId(application.getId())
-        .applicationStatus(
-            ApplicationDto.ApplicationStatusEnum.valueOf(application.getState().getCurrent()));
+        .applicationId(application.getId());
   }
 }
